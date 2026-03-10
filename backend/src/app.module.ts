@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { CompaniesModule } from './modules/companies/companies.module';
@@ -13,6 +12,9 @@ import { AttendeesModule } from './modules/attendees/attendees.module';
 import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
 import { CompanyNewsModule } from './modules/company-news/company-news.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+
+import { APP_GUARD } from '@nestjs/core';
+import { JwtGlobalGuard } from './common/guards/jwt-global.guard';
 
 @Module({
   imports: [
@@ -45,6 +47,12 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
     SubscriptionsModule,
     CompanyNewsModule,
     NotificationsModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: JwtGlobalGuard,
+    },
   ],
 })
 export class AppModule {}
