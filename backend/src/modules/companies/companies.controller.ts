@@ -7,7 +7,9 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
+import { GetCompaniesQueryDto } from './dto/get-companies-query.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CompaniesService } from './companies.service';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -33,6 +35,12 @@ export class CompaniesController {
   @Get('my')
   getMyCompany(@CurrentUser() user: { sub: string }) {
     return this.companiesService.getMyCompany(user.sub);
+  }
+
+  @Public()
+  @Get()
+  getAllCompanies(@Query() query: GetCompaniesQueryDto) {
+    return this.companiesService.getAllPublic(query);
   }
 
   @Public()

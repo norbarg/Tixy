@@ -1,11 +1,20 @@
 //src/modules/events/events.controller.ts
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { EventsService } from './events.service';
 import { Public } from '../../common/decorators/public.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UserRole } from '../../common/enums/user-role.enum';
+import { GetEventsQueryDto } from './dto/get-events-query.dto';
 
 @ApiTags('Events')
 @ApiBearerAuth()
@@ -23,8 +32,8 @@ export class EventsController {
 
   @Public()
   @Get()
-  getAllEvents() {
-    return this.eventsService.getAllPublic();
+  getAllEvents(@Query() query: GetEventsQueryDto) {
+    return this.eventsService.getAllPublic(query);
   }
 
   @Public()

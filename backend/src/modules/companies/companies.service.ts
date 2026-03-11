@@ -7,11 +7,12 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Brackets } from 'typeorm';
 import { Company } from '../../database/entities/companies.entity';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { UserRole } from '../../common/enums/user-role.enum';
+import { GetCompaniesQueryDto } from './dto/get-companies-query.dto';
 
 @Injectable()
 export class CompaniesService {
@@ -79,6 +80,33 @@ export class CompaniesService {
     }
 
     return this.sanitizeCompany(company);
+  }
+
+  async getAllPublic(query: GetCompaniesQueryDto) {
+    const qb = this.companiesRepository.createQueryBuilder('company');
+
+    if (query.search) {
+      qb.where(
+        new Brackets((subQb) => {
+          subQb
+            .where('company.name ILIKE :search', {
+              search: `%${query.search}%`,
+            })
+            .orWhere('company.description ILIKE :search', {
+              search: `%${query.search}%`,
+            })
+            .orWhere('company.placeAddress ILIKE :search', {
+              search: `%${query.search}%`,
+            });
+        }),
+      );
+    }
+
+    qb.orderBy('company.createdAt', 'DESC');
+
+    const companies = await qb.getMany();
+
+    return companies.map((company) => this.sanitizeCompany(company));
   }
 
   async getById(id: string) {

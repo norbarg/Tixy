@@ -6,13 +6,14 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Brackets } from 'typeorm';
 import { Event } from '../../database/entities/events.entity';
 import { Company } from '../../database/entities/companies.entity';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UserRole } from '../../common/enums/user-role.enum';
 import { EventStatus } from '../../common/enums/event-status.enum';
 import { VisitorsVisibility } from '../../common/enums/visitors-visibility.enum';
+import { GetEventsQueryDto } from './dto/get-events-query.dto';
 
 @Injectable()
 export class EventsService {
@@ -93,15 +94,72 @@ export class EventsService {
     return this.sanitizePrivateEvent(savedEvent);
   }
 
-  async getAllPublic() {
-    const events = await this.eventsRepository.find({
-      where: {
-        status: EventStatus.PUBLISHED,
-      },
-      order: {
-        startsAt: 'ASC',
-      },
+  async getAllPublic(query: GetEventsQueryDto) {
+    const qb = this.eventsRepository.createQueryBuilder('event');
+
+    qb.where('event.status = :status', {
+      status: EventStatus.PUBLISHED,
     });
+
+    if (query.format) {
+      qb.andWhere('event.format = :format', {
+        format: query.format,
+      });
+    }
+
+    if (query.category) {
+      qb.andWhere('event.category = :category', {
+        category: query.category,
+      });
+    }
+
+    if (query.search) {
+      qb.andWhere(
+        new Brackets((subQb) => {
+          subQb
+            .where('event.title ILIKE :search', {
+              search: `%${query.search}%`,
+            })
+            .orWhere('event.description ILIKE :search', {
+              search: `%${query.search}%`,
+            })
+            .orWhere('event.placeName ILIKE :search', {
+              search: `%${query.search}%`,
+            })
+            .orWhere('event.placeAddress ILIKE :search', {
+              search: `%${query.search}%`,
+            });
+        }),
+      );
+    }
+
+    if (query.place) {
+      qb.andWhere(
+        new Brackets((subQb) => {
+          subQb
+            .where('event.placeName ILIKE :place', {
+              place: `%${query.place}%`,
+            })
+            .orWhere('event.placeAddress ILIKE :place', {
+              place: `%${query.place}%`,
+            });
+        }),
+      );
+    }
+
+    if (query.date) {
+      const startOfDay = new Date(`${query.date}T00:00:00.000Z`);
+      const endOfDay = new Date(`${query.date}T23:59:59.999Z`);
+
+      qb.andWhere('event.startsAt BETWEEN :startOfDay AND :endOfDay', {
+        startOfDay,
+        endOfDay,
+      });
+    }
+
+    qb.orderBy('event.startsAt', 'ASC');
+
+    const events = await qb.getMany();
 
     return events.map((event) => this.sanitizePublicEvent(event));
   }
