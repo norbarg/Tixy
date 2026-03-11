@@ -4,6 +4,7 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -44,9 +45,27 @@ export class CompaniesService {
       description: dto.description ?? null,
       email: dto.email,
       avatarUrl: dto.avatarUrl ?? null,
-      location: dto.location ?? null,
+      placeAddress: dto.placeAddress ?? null,
+      googleMapsUrl: dto.googleMapsUrl ?? null,
+      googlePlaceId: dto.googlePlaceId ?? null,
+      placeLat: dto.placeLat ?? null,
+      placeLng: dto.placeLng ?? null,
     });
+    const hasAnyMapPointField =
+      dto.googlePlaceId !== undefined ||
+      dto.placeLat !== undefined ||
+      dto.placeLng !== undefined;
 
+    const hasFullMapPointField =
+      dto.googlePlaceId !== undefined &&
+      dto.placeLat !== undefined &&
+      dto.placeLng !== undefined;
+
+    if (hasAnyMapPointField && !hasFullMapPointField) {
+      throw new BadRequestException(
+        'googlePlaceId, placeLat and placeLng must be provided together',
+      );
+    }
     const savedCompany = await this.companiesRepository.save(company);
 
     return this.sanitizeCompany(savedCompany);
@@ -106,10 +125,41 @@ export class CompaniesService {
       company.avatarUrl = dto.avatarUrl ?? null;
     }
 
-    if (dto.location !== undefined) {
-      company.location = dto.location ?? null;
+    if (dto.placeAddress !== undefined) {
+      company.placeAddress = dto.placeAddress ?? null;
     }
 
+    if (dto.googleMapsUrl !== undefined) {
+      company.googleMapsUrl = dto.googleMapsUrl ?? null;
+    }
+
+    if (dto.googlePlaceId !== undefined) {
+      company.googlePlaceId = dto.googlePlaceId ?? null;
+    }
+
+    if (dto.placeLat !== undefined) {
+      company.placeLat = dto.placeLat ?? null;
+    }
+
+    if (dto.placeLng !== undefined) {
+      company.placeLng = dto.placeLng ?? null;
+    }
+
+    const hasAnyMapPointField =
+      dto.googlePlaceId !== undefined ||
+      dto.placeLat !== undefined ||
+      dto.placeLng !== undefined;
+
+    const hasFullMapPointField =
+      dto.googlePlaceId !== undefined &&
+      dto.placeLat !== undefined &&
+      dto.placeLng !== undefined;
+
+    if (hasAnyMapPointField && !hasFullMapPointField) {
+      throw new BadRequestException(
+        'googlePlaceId, placeLat and placeLng must be provided together',
+      );
+    }
     const updatedCompany = await this.companiesRepository.save(company);
 
     return this.sanitizeCompany(updatedCompany);
@@ -147,9 +197,13 @@ export class CompaniesService {
       description: company.description,
       email: company.email,
       avatarUrl: company.avatarUrl,
-      location: company.location,
       createdAt: company.createdAt,
       updatedAt: company.updatedAt,
+      placeAddress: company.placeAddress,
+      googleMapsUrl: company.googleMapsUrl,
+      googlePlaceId: company.googlePlaceId,
+      placeLat: company.placeLat,
+      placeLng: company.placeLng,
     };
   }
 }

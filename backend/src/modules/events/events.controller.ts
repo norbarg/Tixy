@@ -1,4 +1,43 @@
-import { Controller } from '@nestjs/common';
+//src/modules/events/events.controller.ts
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { EventsService } from './events.service';
+import { Public } from '../../common/decorators/public.decorator';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { CreateEventDto } from './dto/create-event.dto';
+import { UserRole } from '../../common/enums/user-role.enum';
 
+@ApiTags('Events')
+@ApiBearerAuth()
 @Controller('events')
-export class EventsController {}
+export class EventsController {
+  constructor(private readonly eventsService: EventsService) {}
+
+  @Post()
+  createEvent(
+    @CurrentUser() user: { sub: string },
+    @Body() dto: CreateEventDto,
+  ) {
+    return this.eventsService.create(user.sub, dto);
+  }
+
+  @Public()
+  @Get()
+  getAllEvents() {
+    return this.eventsService.getAllPublic();
+  }
+
+  @Public()
+  @Get(':id')
+  getEventById(@Param('id') id: string) {
+    return this.eventsService.getPublicById(id);
+  }
+
+  @Delete(':id')
+  deleteEvent(
+    @Param('id') id: string,
+    @CurrentUser() user: { sub: string; role: UserRole },
+  ) {
+    return this.eventsService.delete(id, user);
+  }
+}
