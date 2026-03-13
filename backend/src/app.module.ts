@@ -12,6 +12,9 @@ import { AttendeesModule } from './modules/attendees/attendees.module';
 import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
 import { CompanyNewsModule } from './modules/company-news/company-news.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { PaymentsModule } from './modules/payments/payments.module';
+import { TicketsModule } from './modules/tickets/tickets.module';
+import { MailModule } from './modules/mail/mail.module';
 
 import { APP_GUARD } from '@nestjs/core';
 import { JwtGlobalGuard } from './common/guards/jwt-global.guard';
@@ -47,6 +50,9 @@ import { JwtGlobalGuard } from './common/guards/jwt-global.guard';
     SubscriptionsModule,
     CompanyNewsModule,
     NotificationsModule,
+    PaymentsModule,
+    TicketsModule,
+    MailModule,
   ],
   providers: [
     {
