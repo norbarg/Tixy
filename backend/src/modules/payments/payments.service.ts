@@ -1,3 +1,4 @@
+//src/modules/payments/payments.service.ts
 import {
   BadRequestException,
   ForbiddenException,
@@ -12,6 +13,10 @@ import { EventAttendee } from '../../database/entities/event_attendees.entity';
 import { PaymentStatus } from '../../common/enums/payment-status.enum';
 import { TicketsService } from '../tickets/tickets.service';
 import { MailService } from '../mail/mail.service';
+import { Event } from '../../database/entities/events.entity';
+import { Company } from '../../database/entities/companies.entity';
+import { User } from '../../database/entities/users.entity';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class PaymentsService {
@@ -22,8 +27,15 @@ export class PaymentsService {
     private readonly ordersRepository: Repository<Order>,
     @InjectRepository(EventAttendee)
     private readonly attendeesRepository: Repository<EventAttendee>,
+    @InjectRepository(Event)
+    private readonly eventsRepository: Repository<Event>,
+    @InjectRepository(Company)
+    private readonly companiesRepository: Repository<Company>,
+    @InjectRepository(User)
+    private readonly usersRepository: Repository<User>,
     private readonly ticketsService: TicketsService,
     private readonly mailService: MailService,
+    private readonly notificationsService: NotificationsService,
   ) {
     this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
   }
@@ -121,7 +133,27 @@ export class PaymentsService {
 
       await this.attendeesRepository.save(attendee);
     }
+    const event = await this.eventsRepository.findOne({
+      where: { id: order.eventId },
+    });
 
+    if (event && event.notifyOnNewVisitor) {
+      const company = await this.companiesRepository.findOne({
+        where: { id: event.companyId },
+      });
+
+      const buyer = await this.usersRepository.findOne({
+        where: { id: order.userId },
+      });
+
+      if (company && buyer) {
+        await this.notificationsService.createNewVisitorNotification({
+          userId: company.ownerUserId,
+          eventTitle: event.title,
+          visitorLogin: buyer.login,
+        });
+      }
+    }
     const ticketData =
       await this.ticketsService.generatePaidOrderTicketPdfForEmail(order.id);
 

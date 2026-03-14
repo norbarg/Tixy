@@ -14,6 +14,7 @@ import { UserRole } from '../../common/enums/user-role.enum';
 import { EventStatus } from '../../common/enums/event-status.enum';
 import { VisitorsVisibility } from '../../common/enums/visitors-visibility.enum';
 import { GetEventsQueryDto } from './dto/get-events-query.dto';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class EventsService {
@@ -22,6 +23,7 @@ export class EventsService {
     private readonly eventsRepository: Repository<Event>,
     @InjectRepository(Company)
     private readonly companiesRepository: Repository<Company>,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   findById(id: string): Promise<Event | null> {
@@ -90,6 +92,7 @@ export class EventsService {
     }
 
     const savedEvent = await this.eventsRepository.save(event);
+    await this.notificationsService.createNewEventNotifications(savedEvent.id);
 
     return this.sanitizePrivateEvent(savedEvent);
   }
