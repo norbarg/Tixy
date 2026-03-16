@@ -15,6 +15,9 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
 import { PaymentsModule } from './modules/payments/payments.module';
 import { TicketsModule } from './modules/tickets/tickets.module';
 import { MailModule } from './modules/mail/mail.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import * as path from 'path';
+import { UploadsModule } from './modules/uploads/uploads.module';
 
 import { APP_GUARD } from '@nestjs/core';
 import { JwtGlobalGuard } from './common/guards/jwt-global.guard';
@@ -23,6 +26,11 @@ import { JwtGlobalGuard } from './common/guards/jwt-global.guard';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+    }),
+
+    ServeStaticModule.forRoot({
+      rootPath: path.resolve(process.cwd(), 'uploads'),
+      serveRoot: '/uploads',
     }),
 
     TypeOrmModule.forRootAsync({
@@ -53,6 +61,7 @@ import { JwtGlobalGuard } from './common/guards/jwt-global.guard';
     PaymentsModule,
     TicketsModule,
     MailModule,
+    UploadsModule,
   ],
   providers: [
     {
