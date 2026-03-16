@@ -5,6 +5,7 @@ import {
   IsString,
   MaxLength,
   MinLength,
+  IsNumberString,
 } from 'class-validator';
 
 export class CreateCompanyDto {
@@ -30,9 +31,29 @@ export class CreateCompanyDto {
   @IsString()
   avatarUrl?: string;
 
-  @ApiPropertyOptional({ example: 'Kharkiv, Ukraine' })
+  @ApiPropertyOptional({ example: 'Kharkiv, main street 1' })
   @IsOptional()
   @IsString()
   @MaxLength(255)
-  location?: string;
+  placeAddress?: string;
+
+  @ApiPropertyOptional({ example: 'https://maps.google.com/...' })
+  @IsOptional()
+  @IsString()
+  googleMapsUrl?: string;
+
+  @ApiPropertyOptional({ example: 'ChIJN1t_tDeuEmsRUsoyG83frY4' })
+  @IsOptional()
+  @IsString()
+  googlePlaceId?: string;
+
+  @ApiPropertyOptional({ example: '49.9935000' })
+  @IsOptional()
+  @IsNumberString()
+  placeLat?: string;
+
+  @ApiPropertyOptional({ example: '36.2304000' })
+  @IsOptional()
+  @IsNumberString()
+  placeLng?: string;
 }

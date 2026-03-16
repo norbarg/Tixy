@@ -12,6 +12,7 @@ import { Company } from './companies.entity';
 import { EventFormat } from '../../common/enums/event-format.enum';
 import { VisitorsVisibility } from '../../common/enums/visitors-visibility.enum';
 import { EventStatus } from '../../common/enums/event-status.enum';
+import { EventCategory } from '../../common/enums/event-category.enum';
 
 @Entity('events')
 export class Event {
@@ -37,8 +38,11 @@ export class Event {
   })
   format: EventFormat;
 
-  @Column()
-  category: string;
+  @Column({
+    type: 'enum',
+    enum: EventCategory,
+  })
+  category: EventCategory;
 
   @Column({ name: 'banner_url', type: 'varchar', nullable: true })
   bannerUrl: string | null;
@@ -55,14 +59,35 @@ export class Event {
   @Column({ name: 'google_maps_url', type: 'varchar', nullable: true })
   googleMapsUrl: string | null;
 
+  @Column({ name: 'google_place_id', type: 'varchar', nullable: true })
+  googlePlaceId: string | null;
+
+  @Column({
+    name: 'place_lat',
+    type: 'decimal',
+    precision: 10,
+    scale: 7,
+    nullable: true,
+  })
+  placeLat: string | null;
+
+  @Column({
+    name: 'place_lng',
+    type: 'decimal',
+    precision: 10,
+    scale: 7,
+    nullable: true,
+  })
+  placeLng: string | null;
+
   @Column({ name: 'starts_at', type: 'timestamp' })
   startsAt: Date;
 
   @Column({ name: 'ends_at', type: 'timestamp' })
   endsAt: Date;
 
-  @Column({ name: 'published_at', type: 'timestamp', nullable: true })
-  publishedAt: Date | null;
+  @Column({ name: 'published_at', type: 'timestamp' })
+  publishedAt: Date;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   price: string;
@@ -84,7 +109,7 @@ export class Event {
   @Column({
     type: 'enum',
     enum: EventStatus,
-    default: EventStatus.DRAFT,
+    default: EventStatus.PUBLISHED,
   })
   status: EventStatus;
 

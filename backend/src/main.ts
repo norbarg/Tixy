@@ -2,10 +2,13 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import helmet from 'helmet';
+import * as express from 'express';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    rawBody: true,
+  });
 
   app.use(helmet());
 
@@ -25,8 +28,8 @@ async function bootstrap() {
   );
 
   const config = new DocumentBuilder()
-    .setTitle('Ticket App API')
-    .setDescription('API for university ticketing/events app')
+    .setTitle('Tixy API')
+    .setDescription('API for Tixy backend')
     .setVersion('1.0')
     .addBearerAuth()
     .build();
@@ -34,6 +37,6 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
 
-  await app.listen(process.env.PORT || 5000);
+  await app.listen(process.env.PORT || 5001);
 }
 bootstrap();

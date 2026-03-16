@@ -4,13 +4,15 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Brackets } from 'typeorm';
 import { Company } from '../../database/entities/companies.entity';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { UserRole } from '../../common/enums/user-role.enum';
+import { GetCompaniesQueryDto } from './dto/get-companies-query.dto';
 
 @Injectable()
 export class CompaniesService {
@@ -44,9 +46,27 @@ export class CompaniesService {
       description: dto.description ?? null,
       email: dto.email,
       avatarUrl: dto.avatarUrl ?? null,
-      location: dto.location ?? null,
+      placeAddress: dto.placeAddress ?? null,
+      googleMapsUrl: dto.googleMapsUrl ?? null,
+      googlePlaceId: dto.googlePlaceId ?? null,
+      placeLat: dto.placeLat ?? null,
+      placeLng: dto.placeLng ?? null,
     });
+    const hasAnyMapPointField =
+      dto.googlePlaceId !== undefined ||
+      dto.placeLat !== undefined ||
+      dto.placeLng !== undefined;
 
+    const hasFullMapPointField =
+      dto.googlePlaceId !== undefined &&
+      dto.placeLat !== undefined &&
+      dto.placeLng !== undefined;
+
+    if (hasAnyMapPointField && !hasFullMapPointField) {
+      throw new BadRequestException(
+        'googlePlaceId, placeLat and placeLng must be provided together',
+      );
+    }
     const savedCompany = await this.companiesRepository.save(company);
 
     return this.sanitizeCompany(savedCompany);
@@ -60,6 +80,33 @@ export class CompaniesService {
     }
 
     return this.sanitizeCompany(company);
+  }
+
+  async getAllPublic(query: GetCompaniesQueryDto) {
+    const qb = this.companiesRepository.createQueryBuilder('company');
+
+    if (query.search) {
+      qb.where(
+        new Brackets((subQb) => {
+          subQb
+            .where('company.name ILIKE :search', {
+              search: `%${query.search}%`,
+            })
+            .orWhere('company.description ILIKE :search', {
+              search: `%${query.search}%`,
+            })
+            .orWhere('company.placeAddress ILIKE :search', {
+              search: `%${query.search}%`,
+            });
+        }),
+      );
+    }
+
+    qb.orderBy('company.createdAt', 'DESC');
+
+    const companies = await qb.getMany();
+
+    return companies.map((company) => this.sanitizeCompany(company));
   }
 
   async getById(id: string) {
@@ -106,10 +153,41 @@ export class CompaniesService {
       company.avatarUrl = dto.avatarUrl ?? null;
     }
 
-    if (dto.location !== undefined) {
-      company.location = dto.location ?? null;
+    if (dto.placeAddress !== undefined) {
+      company.placeAddress = dto.placeAddress ?? null;
     }
 
+    if (dto.googleMapsUrl !== undefined) {
+      company.googleMapsUrl = dto.googleMapsUrl ?? null;
+    }
+
+    if (dto.googlePlaceId !== undefined) {
+      company.googlePlaceId = dto.googlePlaceId ?? null;
+    }
+
+    if (dto.placeLat !== undefined) {
+      company.placeLat = dto.placeLat ?? null;
+    }
+
+    if (dto.placeLng !== undefined) {
+      company.placeLng = dto.placeLng ?? null;
+    }
+
+    const hasAnyMapPointField =
+      dto.googlePlaceId !== undefined ||
+      dto.placeLat !== undefined ||
+      dto.placeLng !== undefined;
+
+    const hasFullMapPointField =
+      dto.googlePlaceId !== undefined &&
+      dto.placeLat !== undefined &&
+      dto.placeLng !== undefined;
+
+    if (hasAnyMapPointField && !hasFullMapPointField) {
+      throw new BadRequestException(
+        'googlePlaceId, placeLat and placeLng must be provided together',
+      );
+    }
     const updatedCompany = await this.companiesRepository.save(company);
 
     return this.sanitizeCompany(updatedCompany);
@@ -147,9 +225,13 @@ export class CompaniesService {
       description: company.description,
       email: company.email,
       avatarUrl: company.avatarUrl,
-      location: company.location,
       createdAt: company.createdAt,
       updatedAt: company.updatedAt,
+      placeAddress: company.placeAddress,
+      googleMapsUrl: company.googleMapsUrl,
+      googlePlaceId: company.googlePlaceId,
+      placeLat: company.placeLat,
+      placeLng: company.placeLng,
     };
   }
 }

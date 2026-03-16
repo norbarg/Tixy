@@ -34,8 +34,32 @@ export class Company {
   @Column({ name: 'avatar_url', type: 'varchar', nullable: true })
   avatarUrl: string | null;
 
-  @Column({ type: 'varchar', nullable: true })
-  location: string | null;
+  @Column({ name: 'place_address', type: 'varchar', nullable: true })
+  placeAddress: string | null;
+
+  @Column({ name: 'google_maps_url', type: 'varchar', nullable: true })
+  googleMapsUrl: string | null;
+
+  @Column({ name: 'google_place_id', type: 'varchar', nullable: true })
+  googlePlaceId: string | null;
+
+  @Column({
+    name: 'place_lat',
+    type: 'decimal',
+    precision: 10,
+    scale: 7,
+    nullable: true,
+  })
+  placeLat: string | null;
+
+  @Column({
+    name: 'place_lng',
+    type: 'decimal',
+    precision: 10,
+    scale: 7,
+    nullable: true,
+  })
+  placeLng: string | null;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
