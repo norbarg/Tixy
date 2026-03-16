@@ -1,38 +1,38 @@
 .header {
-  width: 100%;
-  background: #fff;
-  border-bottom: 1px solid #e8e8e8;
+    width: 100%;
+    background: #fff;
+    border-bottom: 1px solid #e8e8e8;
 }
 
 .header__inner {
-  max-width: 1500px;
-  margin: 0 auto;
-  padding: 15px 36px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
+    max-width: 1480px;
+    margin: 0 auto;
+    padding: 15px 36px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
 }
 
 .header__left {
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
 }
 
 .header__logo-image {
-  height: 50px;
-  width: auto;
-  display: block;
-  object-fit: contain;
+    height: 50px;
+    width: auto;
+    display: block;
+    object-fit: contain;
 }
 
 .header__right {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 28px;
-  flex-wrap: wrap;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 28px;
+    flex-wrap: wrap;
 }
 
 .header__login-btn,
@@ -40,112 +40,112 @@
 .header__country,
 .header__icon-btn,
 .header__cart {
-  font-family: 'League Spartan', sans-serif;
+    font-family: 'League Spartan', sans-serif;
 }
 
 .header__login-btn,
 .header__nav-btn {
-  border: none;
-  background: transparent;
-  color: #727E8A;
-  font-size: 18px;
-  font-weight: 400;
-  line-height: 1;
-  cursor: pointer;
-  padding: 0;
+    border: none;
+    background: transparent;
+    color: #727e8a;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
 }
 
 .header__icon-btn {
-  position: relative;
-  border: none;
-  background: transparent;
-  padding: 0;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    position: relative;
+    border: none;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .header__icon-btn--bell {
-  width: 30px;
-  height: 30px;
+    width: 30px;
+    height: 30px;
 }
 
 .header__icon {
-  width: 20px;
-  height: 20px;
-  object-fit: contain;
-  display: block;
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    display: block;
 }
 
 .header__dot {
-  position: absolute;
-  top: 2px;
-  right: 3px;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #7C94D4;
+    position: absolute;
+    top: 2px;
+    right: 3px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #7c94d4;
 }
 
 .header__dot--cart {
-  top: -1px;
-  right: -5px;
+    top: -1px;
+    right: -5px;
 }
 
 .header__cart {
-  min-width: 140px;
-  height: 46px;
-  padding: 0 26px;
-  border: 2px solid #E0E3E3;
-  border-radius: 12px;
-  background: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  cursor: pointer;
+    min-width: 140px;
+    height: 46px;
+    padding: 0 26px;
+    border: 2px solid #e0e3e3;
+    border-radius: 12px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    cursor: pointer;
 }
 
 .header__cart-price {
-  color: #7C94D4;
-  font-size: 18px;
-  font-weight: 300;
-  line-height: 1;
+    color: #7c94d4;
+    font-size: 18px;
+    font-weight: 300;
+    line-height: 1;
 }
 
 .header__cart-icon-wrap {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .header__badge--cart {
-  top: -9px;
-  right: -11px;
+    top: -9px;
+    right: -11px;
 }
 
 .header__country {
-  border: none;
-  background: transparent;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  cursor: pointer;
+    border: none;
+    background: transparent;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
 }
 
 .header__country-text {
-  color: #727E8A;
-  font-size: 18px;
-  font-weight: 400;
-  line-height: 1;
+    color: #727e8a;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1;
 }
 
 .header__country-flag {
-  width: 25px;
-  height: 25px;
-  object-fit: contain;
-  display: block;
+    width: 25px;
+    height: 25px;
+    object-fit: contain;
+    display: block;
 }
