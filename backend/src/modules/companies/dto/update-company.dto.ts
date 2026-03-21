@@ -1,3 +1,4 @@
+//update-company.dto.ts
 import { PartialType } from '@nestjs/swagger';
 import { CreateCompanyDto } from './create-company.dto';
 

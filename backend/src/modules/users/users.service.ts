@@ -1,3 +1,4 @@
+//src/modules/users/users.service.ts
 import {
   BadRequestException,
   ConflictException,
@@ -47,6 +48,14 @@ export class UsersService {
 
   save(user: User): Promise<User> {
     return this.usersRepository.save(user);
+  }
+
+  async getAllUsers() {
+    const users = await this.usersRepository.find({
+      order: { createdAt: 'DESC' },
+    });
+
+    return users.map((user) => this.sanitizeUser(user));
   }
 
   async updateLogin(userId: string, newLogin: string) {

@@ -1,3 +1,4 @@
+// promo-codes.module.ts
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PromoCode } from '../../database/entities/promo_codes.entity';

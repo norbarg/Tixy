@@ -1,7 +1,9 @@
+//src/modules/users/users.controller.ts
 import {
   Body,
   Controller,
   Delete,
+  Get,
   Param,
   Patch,
   UseGuards,
@@ -19,6 +21,13 @@ import { RolesGuard } from '../../common/guards/roles.guard';
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
+  @Roles(UserRole.ADMIN)
+  @UseGuards(RolesGuard)
+  @Get()
+  getAllUsers() {
+    return this.usersService.getAllUsers();
+  }
 
   @Patch('me')
   updateMyLogin(

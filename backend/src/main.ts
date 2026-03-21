@@ -9,8 +9,13 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     rawBody: true,
   });
-
-  app.use(helmet());
+// для того чтобі фотки норм загружались, а не падали с ошибкой 413 Payload Too Large
+app.use(
+  helmet({
+    crossOriginResourcePolicy: false,
+  }),
+);
+  // app.use(helmet());
 
   app.enableCors({
     origin: true,
