@@ -1,4 +1,4 @@
-import googleLogo from '../../assets/google.png';
+import googleLogo from '../../assets/auth/google.png';
 
 export function GoogleButton() {
     const handleGoogleAuth = () => {

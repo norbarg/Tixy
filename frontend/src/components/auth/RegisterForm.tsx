@@ -3,7 +3,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import { GoogleButton } from './GoogleButton';
-import arrowRight from '../../assets/arrow.png';
+import arrowRight from '../../assets/auth/arrow.png';
 
 export function RegisterForm() {
   const { register } = useAuth();

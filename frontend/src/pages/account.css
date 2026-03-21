@@ -1,0 +1,377 @@
+/* account.css */
+.account-sidebar {
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.account-sidebar__item {
+  width: 223px;
+  height: 40px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: #7C94D4;
+  font-size: 18px;
+  font-weight: 500;
+  text-align: left;
+  padding: 0 18px;
+  cursor: pointer;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+.account-sidebar__item.active{
+  background: #E9EEFF;
+  color: #111;
+}
+
+.account-sidebar__item:not(.active):hover {
+  background: #F2F7FF;
+  color: #111;
+}
+
+ .account-page__title {
+  text-align: center;
+  font-size: 30px;
+  font-weight: 500;
+  margin: 150px 0 60px;
+  color: #111;
+}
+
+.account-block {
+  margin-bottom: 48px;
+}
+
+.account-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto auto;
+  gap: 18px;
+  align-items: center;
+}
+
+.account-input,
+.account-textarea {
+  width: 100%;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #111;
+  font-size: 18px;
+  font-weight: 400;
+  padding: 10px 0;
+  outline: none;
+}
+
+.account-input--readonly {
+  color: #727E8A;
+  font-weight: 400;
+}
+
+.account-input.editing,
+.account-textarea.editing {
+  border-bottom: 2px solid #7C94D4;
+  background: #fff;
+}
+
+.account-textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.account-action-btn,
+.account-danger-btn {
+  border: none;
+  border-radius: 12px;
+  height: 38px;
+  padding: 0 16px;
+  font-size: 18px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.account-action-btn {
+  background: #E9EEFF;
+  color: #727E8A;
+}
+
+.account-danger-btn {
+  background: #FFE9E9;
+  color: #727E8A;
+}
+
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.orders-item {
+  display: grid;
+  grid-template-columns: 1.4fr .7fr 1.8fr .8fr 2.2fr;
+  gap: 16px;
+  padding: 18px 0;
+  border-bottom: 1px solid #E0E3E3;
+  color: #111;
+  font-size: 18px;
+}
+
+.orders-item > div:first-child {
+  color: #111;
+}
+
+.orders-item > div:not(:first-child) {
+  color: #727E8A;
+}
+
+.account-muted {
+  color: #727e8a;
+  font-size: 18px;
+  font-weight: 400;
+
+}
+
+.account-error {
+  color: #D2222F;
+  font-size: 15px;
+  margin-top: 12px;
+}
+
+.orders-head,
+.account-block__heading{
+  display: grid;
+  grid-template-columns: 1.4fr .7fr 1.8fr .8fr 2.2fr;
+  gap: 16px;
+  padding: 0 0 12px;
+  border-bottom: 2px solid #E0E3E3;
+  color: #7C94D4;
+  font-size: 20px;
+  font-weight: 400;
+}
+
+.account-empty {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 8px;
+}
+
+ .account-home-link {
+  color: #7c94d4;
+  text-decoration: none;
+  font-size: 18px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+.account-home-link:hover {
+  color: #D2222F;
+}
+
+.account-home-link__icon {
+  width: 12px;
+  height: 12px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.account-sidebar__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.account-sidebar__icon {
+  width: 25px;
+  height: 25px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.account-page {
+  height: calc(100vh - 208px);
+  overflow: hidden;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.account-page__inner {
+  max-width: 1480px;
+  padding: 0 120px;
+  margin: 0 auto;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 70px;
+  align-items: stretch;
+}
+
+.account-content {
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0px 8px 32px 0;
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none; 
+}
+
+.account-content::-webkit-scrollbar {
+  display: none;
+}
+
+.account-scroll-item {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  will-change: opacity, transform;
+}
+
+.account-scroll-item.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.company-card {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) auto;
+  column-gap: 28px;
+  align-items: start;
+}
+
+.company-card__avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #dce2f4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  color: #111;
+  font-size: 24px;
+  font-weight: 700;
+  margin-top: 6px;
+}
+
+.company-card__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.company-card__fields {
+  display: grid;
+  grid-template-columns: minmax(260px, 1.6fr) minmax(240px, 1.1fr) minmax(240px, 1fr);
+  column-gap: 36px;
+  row-gap: 16px;
+  align-items: start;
+  min-width: 0;
+}
+
+.company-card__name {
+  grid-column: 1;
+  grid-row: 1;
+  font-weight: 400;
+}
+
+.company-card__email {
+  grid-column: 2;
+  grid-row: 1;
+  margin-left: -55px;
+}
+
+.company-card__address {
+  grid-column: 3;
+  grid-row: 1;
+  color: #727E8A;
+  margin-left: 47px;
+}
+
+.company-card__description {
+  grid-column: 1 / 3;
+  grid-row: 2;
+  height: 96px;
+  min-height: 96px;
+  max-height: 96px;
+  resize: none;
+  overflow-y: auto;
+  overflow-x: hidden;
+  line-height: 1.15;
+  padding-right: 8px;
+  color: #727E8A;
+}
+
+.company-card__actions {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  align-items: center;
+  align-self: end;
+}
+
+.company-card__actions .account-action-btn,
+.company-card__actions .account-danger-btn {
+  height: 52px;
+  padding: 0 28px;
+  white-space: nowrap;
+  border: none;
+  border-radius: 12px;
+  height: 38px;
+  padding: 0 16px;
+  font-size: 18px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* ADMIN */
+.admin-section {
+  margin-top: 28px;
+}
+
+.admin-section__title {
+  font-size: 20px;
+  font-weight: 400;
+  color: #7C94D4;
+  margin-bottom: 16px;
+}
+
+.admin-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.admin-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px 20px;
+  border: 1px solid #E0E3E3;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.admin-row__info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #727E8A;
+  font-size: 18px;
+}
+
+.admin-row__info p {
+  margin: 0;
+}
+
+.admin-row__info strong {
+  color: #111;
+  font-weight: 400;
+}

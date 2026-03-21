@@ -1,3 +1,4 @@
+// event-category.enum.ts
 export enum EventCategory {
   BUSINESS = 'business',
   POLITICS = 'politics',

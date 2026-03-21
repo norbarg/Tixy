@@ -13,3 +13,19 @@ export interface Company {
     placeLat: string | null;
     placeLng: string | null;
 }
+
+export interface CreateCompanyPayload {
+    name: string;
+    email: string;
+    description?: string;
+    avatarUrl?: string;
+    placeAddress?: string;
+}
+
+export interface UpdateCompanyPayload {
+    name?: string;
+    email?: string;
+    description?: string;
+    avatarUrl?: string;
+    placeAddress?: string;
+}

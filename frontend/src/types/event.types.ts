@@ -31,14 +31,15 @@ export interface EventItem {
     placeAddress: string | null;
     googleMapsUrl: string | null;
     googlePlaceId: string | null;
-    placeLat: string | null;
-    placeLng: string | null;
+    placeLat: string | number | null;
+    placeLng: string | number | null;
     startsAt: string;
     endsAt: string;
     publishedAt: string;
     price: string;
     ticketsLimit: number;
     visitorsVisibility: string;
+    notifyOnNewVisitor?: boolean;
     status: string;
     createdAt: string;
     updatedAt: string;

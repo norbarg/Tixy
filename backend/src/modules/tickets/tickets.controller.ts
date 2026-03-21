@@ -1,3 +1,4 @@
+//tickets.controller.ts
 import { Controller, Get, Param, Res } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import type { Response } from 'express';

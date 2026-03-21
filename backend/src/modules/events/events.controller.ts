@@ -1,4 +1,5 @@
 // src/modules/events/events.controller.ts
+
 import {
   Body,
   Controller,
