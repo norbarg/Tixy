@@ -1,3 +1,4 @@
+//src/modules/comments/comments.service.ts
 import {
   ForbiddenException,
   Injectable,
@@ -23,6 +24,14 @@ export class CommentsService {
     return this.commentsRepository.findOne({
       where: { id },
     });
+  }
+
+  async getAllComments() {
+    const comments = await this.commentsRepository.find({
+      order: { createdAt: 'DESC' },
+    });
+
+    return comments.map((comment) => this.sanitizeComment(comment));
   }
 
   async create(authorUserId: string, dto: CreateCommentDto) {

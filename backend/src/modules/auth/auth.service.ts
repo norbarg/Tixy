@@ -1,3 +1,4 @@
+//src/modules/auth/auth.service.ts
 import {
   BadRequestException,
   ConflictException,

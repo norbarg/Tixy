@@ -1,4 +1,15 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+//src/modules/comments/comments.controller.ts
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { RolesGuard } from '../../common/guards/roles.guard';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CommentsService } from './comments.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
@@ -18,6 +29,13 @@ export class CommentsController {
     @Body() dto: CreateCommentDto,
   ) {
     return this.commentsService.create(user.sub, dto);
+  }
+
+  @Roles(UserRole.ADMIN)
+  @UseGuards(RolesGuard)
+  @Get()
+  getAllComments() {
+    return this.commentsService.getAllComments();
   }
 
   @Public()

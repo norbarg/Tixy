@@ -1,3 +1,4 @@
+// src/modules/companies/dto/create-company.dto.ts
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsEmail,

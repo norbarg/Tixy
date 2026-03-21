@@ -1,0 +1,45 @@
+export type EventCategory =
+    | 'business'
+    | 'politics'
+    | 'psychology'
+    | 'music'
+    | 'entertainment'
+    | 'film'
+    | 'technology'
+    | 'design'
+    | 'education'
+    | 'health'
+    | 'sports';
+
+export type EventFormat =
+    | 'CONFERENCE'
+    | 'LECTURE'
+    | 'WORKSHOP'
+    | 'CONCERT'
+    | 'FEST';
+
+export interface EventItem {
+    id: string;
+    companyId: string;
+    title: string;
+    description: string;
+    format: EventFormat;
+    category: EventCategory;
+    bannerUrl: string | null;
+    posterUrl: string | null;
+    placeName: string;
+    placeAddress: string | null;
+    googleMapsUrl: string | null;
+    googlePlaceId: string | null;
+    placeLat: string | null;
+    placeLng: string | null;
+    startsAt: string;
+    endsAt: string;
+    publishedAt: string;
+    price: string;
+    ticketsLimit: number;
+    visitorsVisibility: string;
+    status: string;
+    createdAt: string;
+    updatedAt: string;
+}

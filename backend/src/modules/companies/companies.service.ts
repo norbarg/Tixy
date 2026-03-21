@@ -52,19 +52,15 @@ export class CompaniesService {
       placeLat: dto.placeLat ?? null,
       placeLng: dto.placeLng ?? null,
     });
-    const hasAnyMapPointField =
-      dto.googlePlaceId !== undefined ||
-      dto.placeLat !== undefined ||
-      dto.placeLng !== undefined;
+    const hasAnyCoordinates =
+      dto.placeLat !== undefined || dto.placeLng !== undefined;
 
-    const hasFullMapPointField =
-      dto.googlePlaceId !== undefined &&
-      dto.placeLat !== undefined &&
-      dto.placeLng !== undefined;
+    const hasFullCoordinates =
+      dto.placeLat !== undefined && dto.placeLng !== undefined;
 
-    if (hasAnyMapPointField && !hasFullMapPointField) {
+    if (hasAnyCoordinates && !hasFullCoordinates) {
       throw new BadRequestException(
-        'googlePlaceId, placeLat and placeLng must be provided together',
+        'placeLat and placeLng must be provided together',
       );
     }
     const savedCompany = await this.companiesRepository.save(company);
@@ -173,19 +169,15 @@ export class CompaniesService {
       company.placeLng = dto.placeLng ?? null;
     }
 
-    const hasAnyMapPointField =
-      dto.googlePlaceId !== undefined ||
-      dto.placeLat !== undefined ||
-      dto.placeLng !== undefined;
+    const hasAnyCoordinates =
+      dto.placeLat !== undefined || dto.placeLng !== undefined;
 
-    const hasFullMapPointField =
-      dto.googlePlaceId !== undefined &&
-      dto.placeLat !== undefined &&
-      dto.placeLng !== undefined;
+    const hasFullCoordinates =
+      dto.placeLat !== undefined && dto.placeLng !== undefined;
 
-    if (hasAnyMapPointField && !hasFullMapPointField) {
+    if (hasAnyCoordinates && !hasFullCoordinates) {
       throw new BadRequestException(
-        'googlePlaceId, placeLat and placeLng must be provided together',
+        'placeLat and placeLng must be provided together',
       );
     }
     const updatedCompany = await this.companiesRepository.save(company);

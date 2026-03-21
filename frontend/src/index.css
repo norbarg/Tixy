@@ -1,15 +1,36 @@
+/* // src/index.css */
 * {
-  box-sizing: border-box;
-  font-family: 'League Spartan', sans-serif;
+    box-sizing: border-box;
+    font-family: 'League Spartan', sans-serif;
+
+    --color-black: #000000;
+    --color-white: #ffffff;
+    --color-grey: #e0e3e3;
+    --color-red: #d2222f;
+    --color-softGrey: #6a6a6a;
+    --color-blue-grey: #727e8a;
+
+    --title-font-size-50: 30px;
+    --subtitle-font-size-32: 20px;
+    --main-font-size-24: 18px;
+    --med-font-size-22: 16px;
+    --font-size-20: 14px;
+    --min-font-size-16: 12px;
+
+    --border-radius: 12px;
+
+    --medium: 500;
+    --regular: 400;
+    --bold: 700;
 }
 
 html,
 body,
 #root {
-  margin: 0;
-  min-height: 100%;
+    margin: 0;
+    min-height: 100%;
 }
 
 body {
-  background: #fff;
+    background: #fff;
 }

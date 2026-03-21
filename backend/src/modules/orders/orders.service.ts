@@ -1,4 +1,3 @@
-//src/modules/orders/orders.service.ts
 import {
   BadRequestException,
   ForbiddenException,
@@ -6,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { Order } from '../../database/entities/orders.entity';
 import { Event } from '../../database/entities/events.entity';
 import { PromoCode } from '../../database/entities/promo_codes.entity';
@@ -81,7 +80,7 @@ export class OrdersService {
 
     const savedOrder = await this.ordersRepository.save(order);
 
-    return this.sanitizeOrder(savedOrder);
+    return this.sanitizeOrder(savedOrder, event);
   }
 
   async getMyOrders(userId: string) {
@@ -90,7 +89,21 @@ export class OrdersService {
       order: { createdAt: 'DESC' },
     });
 
-    return orders.map((order) => this.sanitizeOrder(order));
+    if (orders.length === 0) {
+      return [];
+    }
+
+    const eventIds = [...new Set(orders.map((order) => order.eventId))];
+
+    const events = await this.eventsRepository.findBy({
+      id: In(eventIds),
+    });
+
+    const eventsMap = new Map(events.map((event) => [event.id, event]));
+
+    return orders.map((order) =>
+      this.sanitizeOrder(order, eventsMap.get(order.eventId) ?? null),
+    );
   }
 
   async getMyOrderById(orderId: string, userId: string) {
@@ -104,7 +117,11 @@ export class OrdersService {
       throw new ForbiddenException('You do not have access to this order');
     }
 
-    return this.sanitizeOrder(order);
+    const event = await this.eventsRepository.findOne({
+      where: { id: order.eventId },
+    });
+
+    return this.sanitizeOrder(order, event);
   }
 
   async cancelMyPendingOrder(orderId: string, userId: string) {
@@ -126,10 +143,14 @@ export class OrdersService {
 
     const updatedOrder = await this.ordersRepository.save(order);
 
-    return this.sanitizeOrder(updatedOrder);
+    const event = await this.eventsRepository.findOne({
+      where: { id: updatedOrder.eventId },
+    });
+
+    return this.sanitizeOrder(updatedOrder, event);
   }
 
-  private sanitizeOrder(order: Order) {
+  private sanitizeOrder(order: Order, event: Event | null) {
     return {
       id: order.id,
       userId: order.userId,
@@ -146,6 +167,15 @@ export class OrdersService {
       paidAt: order.paidAt,
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,
+      event: event
+        ? {
+            id: event.id,
+            title: event.title,
+            startsAt: event.startsAt,
+            endsAt: event.endsAt,
+            placeAddress: event.placeAddress,
+          }
+        : null,
     };
   }
 }

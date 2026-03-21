@@ -66,6 +66,13 @@ export class AuthController {
   async googleCallback(@Req() req: Request, @Res() res: Response) {
     const result = await this.authService.loginWithGoogle(req.user as any);
 
-    return res.json(result);
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+
+    const redirectUrl =
+      `${frontendUrl}/auth/google/success` +
+      `?accessToken=${encodeURIComponent(result.accessToken)}` +
+      `&refreshToken=${encodeURIComponent(result.refreshToken)}`;
+
+    return res.redirect(redirectUrl);
   }
 }
