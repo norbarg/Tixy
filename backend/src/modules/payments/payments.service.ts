@@ -57,6 +57,20 @@ export class PaymentsService {
       throw new BadRequestException('Only pending orders can be paid');
     }
 
+    const event = await this.eventsRepository.findOne({
+      where: { id: order.eventId },
+    });
+
+    if (!event) {
+      throw new NotFoundException('Event not found');
+    }
+
+    const defaultSuccessUrl = `${process.env.FRONTEND_URL}/`;
+
+    const successUrl = event.redirectAfterPurchaseUrl
+      ? event.redirectAfterPurchaseUrl
+      : defaultSuccessUrl;
+
     const session = await this.stripe.checkout.sessions.create({
       mode: 'payment',
       line_items: [
@@ -71,8 +85,8 @@ export class PaymentsService {
           },
         },
       ],
-      success_url: `${process.env.FRONTEND_URL}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.FRONTEND_URL}/payment-cancel`,
+      success_url: successUrl,
+      cancel_url: `${process.env.FRONTEND_URL}/events/${event.id}`,
       metadata: {
         orderId: order.id,
         userId: order.userId,

@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { api } from '../api/axios';
 import { eventsApi } from '../api/events.api';
 import { promoCodesApi } from '../api/promo-codes.api';
+import { searchPlaces, type PlaceSuggestion } from '../lib/photon';
 
 import 'react-datepicker/dist/react-datepicker.css';
 
@@ -17,909 +18,1235 @@ import Arrow2 from '../assets/auth/arrow.png';
 import './create-event.css';
 
 type PromoCodeFormItem = {
-  code: string;
-  discountPercent: string;
+    code: string;
+    discountPercent: string;
 };
 
 type CreateEventForm = {
-  title: string;
-  description: string;
-  location: string;
-  startsAt: string;
-  endsAt: string;
-  publishedAt: string;
-  format: string;
-  category: string;
-  price: string;
-  ticketsLimit: string;
-  visitorsVisibility: string;
-  notifyOnNewVisitor: boolean;
-  posterUrl: string;
-  bannerUrl: string;
+    title: string;
+    description: string;
+    location: string;
+    placeName: string;
+    placeAddress: string;
+    placeLat: string;
+    placeLng: string;
+    googlePlaceId: string;
+    googleMapsUrl: string;
+    startsAt: string;
+    endsAt: string;
+    publishedAt: string;
+    redirectAfterPurchaseUrl: string;
+    format: string;
+    category: string;
+    price: string;
+    ticketsLimit: string;
+    visitorsVisibility: string;
+    notifyOnNewVisitor: boolean;
+    posterUrl: string;
+    bannerUrl: string;
 };
 
 const FORMAT_OPTIONS = [
-  { value: 'CONFERENCE', label: 'Conference' },
-  { value: 'LECTURE', label: 'Lecture' },
-  { value: 'WORKSHOP', label: 'Workshop' },
-  { value: 'CONCERT', label: 'Concert' },
-  { value: 'FEST', label: 'Fest' },
+    { value: 'CONFERENCE', label: 'Conference' },
+    { value: 'LECTURE', label: 'Lecture' },
+    { value: 'WORKSHOP', label: 'Workshop' },
+    { value: 'CONCERT', label: 'Concert' },
+    { value: 'FEST', label: 'Fest' },
 ];
 
 const CATEGORY_OPTIONS = [
-  { value: 'business', label: 'Business' },
-  { value: 'politics', label: 'Politics' },
-  { value: 'psychology', label: 'Psychology' },
-  { value: 'music', label: 'Music' },
-  { value: 'entertainment', label: 'Entertainment' },
-  { value: 'film', label: 'Film' },
-  { value: 'technology', label: 'Technology' },
-  { value: 'design', label: 'Design' },
-  { value: 'education', label: 'Education' },
-  { value: 'health', label: 'Health' },
-  { value: 'sports', label: 'Sports' },
+    { value: 'business', label: 'Business' },
+    { value: 'politics', label: 'Politics' },
+    { value: 'psychology', label: 'Psychology' },
+    { value: 'music', label: 'Music' },
+    { value: 'entertainment', label: 'Entertainment' },
+    { value: 'film', label: 'Film' },
+    { value: 'technology', label: 'Technology' },
+    { value: 'design', label: 'Design' },
+    { value: 'education', label: 'Education' },
+    { value: 'health', label: 'Health' },
+    { value: 'sports', label: 'Sports' },
 ];
 
 const VISIBILITY_OPTIONS = [
-  {
-    value: 'PUBLIC',
-    label: 'Allow everyone to see the list of event attendees',
-  },
-  {
-    value: 'ATTENDEES_ONLY',
-    label: 'Allow only ticket holders to see the list of event attendees',
-  },
+    {
+        value: 'PUBLIC',
+        label: 'Allow everyone to see the list of event attendees',
+    },
+    {
+        value: 'ATTENDEES_ONLY',
+        label: 'Allow only ticket holders to see the list of event attendees',
+    },
 ];
 
 function formatDateTimeLocal(date: Date): string {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  const hours = String(date.getHours()).padStart(2, '0');
-  const minutes = String(date.getMinutes()).padStart(2, '0');
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
 
-  return `${year}-${month}-${day}T${hours}:${minutes}`;
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
 }
 
 function parseDateTimeLocal(value: string): Date | null {
-  if (!value) return null;
+    if (!value) return null;
 
-  const [datePart, timePart] = value.split('T');
-  if (!datePart || !timePart) return null;
+    const [datePart, timePart] = value.split('T');
+    if (!datePart || !timePart) return null;
 
-  const [year, month, day] = datePart.split('-').map(Number);
-  const [hours, minutes] = timePart.split(':').map(Number);
+    const [year, month, day] = datePart.split('-').map(Number);
+    const [hours, minutes] = timePart.split(':').map(Number);
 
-  if ([year, month, day, hours, minutes].some((item) => Number.isNaN(item))) {
-    return null;
-  }
+    if ([year, month, day, hours, minutes].some((item) => Number.isNaN(item))) {
+        return null;
+    }
 
-  return new Date(year, month - 1, day, hours, minutes);
+    return new Date(year, month - 1, day, hours, minutes);
 }
 
 function formatDateInputLabel(value?: string): string {
-  if (!value) return '';
+    if (!value) return '';
 
-  const date = parseDateTimeLocal(value);
-  if (!date) return '';
+    const date = parseDateTimeLocal(value);
+    if (!date) return '';
 
-  return date.toLocaleString([], {
-    month: '2-digit',
-    day: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+    return date.toLocaleString([], {
+        month: '2-digit',
+        day: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+    });
 }
 
 type CustomDateInputProps = {
-  selectedValue?: string;
-  onClick?: () => void;
-  placeholder: string;
-  className?: string;
+    selectedValue?: string;
+    onClick?: () => void;
+    placeholder: string;
+    className?: string;
 };
 
 const CustomDateInput = forwardRef<HTMLButtonElement, CustomDateInputProps>(
-  ({ selectedValue, onClick, placeholder, className = '' }, ref) => {
-    const displayValue = formatDateInputLabel(selectedValue);
+    ({ selectedValue, onClick, placeholder, className = '' }, ref) => {
+        const displayValue = formatDateInputLabel(selectedValue);
 
-    return (
-      <button
-        type="button"
-        ref={ref}
-        onClick={onClick}
-        className={`event-field__input event-field__input--datepicker ${className}`.trim()}
-      >
-        <span className={displayValue ? '' : 'event-field__datepicker-placeholder'}>
-          {displayValue || placeholder}
-        </span>
-      </button>
-    );
-  },
+        return (
+            <button
+                type="button"
+                ref={ref}
+                onClick={onClick}
+                className={`event-field__input event-field__input--datepicker ${className}`.trim()}
+            >
+                <span
+                    className={
+                        displayValue
+                            ? ''
+                            : 'event-field__datepicker-placeholder'
+                    }
+                >
+                    {displayValue || placeholder}
+                </span>
+            </button>
+        );
+    },
 );
 
 CustomDateInput.displayName = 'CustomDateInput';
 
 export function CreateEventPage() {
-  const navigate = useNavigate();
+    const navigate = useNavigate();
 
-  const posterInputRef = useRef<HTMLInputElement | null>(null);
-  const bannerInputRef = useRef<HTMLInputElement | null>(null);
+    const posterInputRef = useRef<HTMLInputElement | null>(null);
+    const bannerInputRef = useRef<HTMLInputElement | null>(null);
 
-  const defaultPosterUrl = useMemo(
-    () => `${window.location.origin}/defaults/event-poster-default.png`,
-    [],
-  );
-  const defaultBannerUrl = useMemo(
-    () => `${window.location.origin}/defaults/event-banner-default.png`,
-    [],
-  );
-
-  const [form, setForm] = useState<CreateEventForm>({
-    title: '',
-    description: '',
-    location: '',
-    startsAt: '',
-    endsAt: '',
-    publishedAt: '',
-    format: '',
-    category: '',
-    price: '',
-    ticketsLimit: '',
-    visitorsVisibility: 'PUBLIC',
-    notifyOnNewVisitor: true,
-    posterUrl: '',
-    bannerUrl: '',
-  });
-
-  const [promoCodes, setPromoCodes] = useState<PromoCodeFormItem[]>([
-    { code: '', discountPercent: '' },
-  ]);
-
-  const [posterPreviewUrl, setPosterPreviewUrl] = useState('');
-  const [bannerPreviewUrl, setBannerPreviewUrl] = useState('');
-
-  const [isDraggingPoster, setIsDraggingPoster] = useState(false);
-  const [isDraggingBanner, setIsDraggingBanner] = useState(false);
-
-  const [isUploadingPoster, setIsUploadingPoster] = useState(false);
-  const [isUploadingBanner, setIsUploadingBanner] = useState(false);
-  const [isCreatingEvent, setIsCreatingEvent] = useState(false);
-
-  const [isFormatOpen, setIsFormatOpen] = useState(false);
-  const [isCategoryOpen, setIsCategoryOpen] = useState(false);
-  const [isVisibilityOpen, setIsVisibilityOpen] = useState(false);
-
-  const [error, setError] = useState('');
-
-  useEffect(() => {
-    if (!error) return;
-
-    const timer = setTimeout(() => {
-      setError('');
-    }, 3000);
-
-    return () => clearTimeout(timer);
-  }, [error]);
-
-  function handleChange(
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) {
-    const { name, value, type } = e.target as HTMLInputElement;
-
-    setForm((prev) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
-    }));
-  }
-
-  function handlePromoCodeChange(
-    index: number,
-    field: keyof PromoCodeFormItem,
-    value: string,
-  ) {
-    setPromoCodes((prev) =>
-      prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)),
+    const defaultPosterUrl = useMemo(
+        () => `${window.location.origin}/defaults/event-poster-default.png`,
+        [],
     );
-  }
+    const defaultBannerUrl = useMemo(
+        () => `${window.location.origin}/defaults/event-banner-default.png`,
+        [],
+    );
 
-  function addPromoCodeRow() {
-    setPromoCodes((prev) => [...prev, { code: '', discountPercent: '' }]);
-  }
-
-  function removePromoCodeRow(index: number) {
-    setPromoCodes((prev) => prev.filter((_, i) => i !== index));
-  }
-
-  function handleStartsAtChange(date: Date | null) {
-    setForm((prev) => {
-      const nextStartsAt = date ? formatDateTimeLocal(date) : '';
-      const prevEndsAtDate = parseDateTimeLocal(prev.endsAt);
-
-      return {
-        ...prev,
-        startsAt: nextStartsAt,
-        endsAt:
-          date && prevEndsAtDate && prevEndsAtDate.getTime() < date.getTime()
-            ? ''
-            : prev.endsAt,
-      };
+    const [form, setForm] = useState<CreateEventForm>({
+        title: '',
+        description: '',
+        location: '',
+        placeName: '',
+        placeAddress: '',
+        placeLat: '',
+        placeLng: '',
+        googlePlaceId: '',
+        googleMapsUrl: '',
+        startsAt: '',
+        endsAt: '',
+        publishedAt: '',
+        redirectAfterPurchaseUrl: '',
+        format: '',
+        category: '',
+        price: '',
+        ticketsLimit: '',
+        visitorsVisibility: 'PUBLIC',
+        notifyOnNewVisitor: true,
+        posterUrl: '',
+        bannerUrl: '',
     });
-  }
 
-  function handleEndsAtChange(date: Date | null) {
-    setForm((prev) => ({
-      ...prev,
-      endsAt: date ? formatDateTimeLocal(date) : '',
-    }));
-  }
+    const [promoCodes, setPromoCodes] = useState<PromoCodeFormItem[]>([
+        { code: '', discountPercent: '' },
+    ]);
 
-  function handlePublishedAtChange(date: Date | null) {
-    setForm((prev) => ({
-      ...prev,
-      publishedAt: date ? formatDateTimeLocal(date) : '',
-    }));
-  }
+    const [posterPreviewUrl, setPosterPreviewUrl] = useState('');
+    const [bannerPreviewUrl, setBannerPreviewUrl] = useState('');
 
-  async function uploadImage(
-    file: File,
-    endpoint: '/uploads/event-poster' | '/uploads/event-banner',
-    type: 'poster' | 'banner',
-  ) {
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    const [isDraggingPoster, setIsDraggingPoster] = useState(false);
+    const [isDraggingBanner, setIsDraggingBanner] = useState(false);
 
-    if (!allowedTypes.includes(file.type)) {
-      setError('Only jpg, jpeg, png and webp images are allowed');
-      return;
-    }
+    const [isUploadingPoster, setIsUploadingPoster] = useState(false);
+    const [isUploadingBanner, setIsUploadingBanner] = useState(false);
+    const [isCreatingEvent, setIsCreatingEvent] = useState(false);
 
-    const maxSize = type === 'poster' ? 7 * 1024 * 1024 : 10 * 1024 * 1024;
+    const [isFormatOpen, setIsFormatOpen] = useState(false);
+    const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+    const [isVisibilityOpen, setIsVisibilityOpen] = useState(false);
 
-    if (file.size > maxSize) {
-      setError(
-        `${type === 'poster' ? 'Poster' : 'Banner'} size must be up to ${
-          type === 'poster' ? '7' : '10'
-        } MB`,
-      );
-      return;
-    }
-
-    const localPreview = URL.createObjectURL(file);
-
-    if (type === 'poster') {
-      setPosterPreviewUrl(localPreview);
-      setIsUploadingPoster(true);
-    } else {
-      setBannerPreviewUrl(localPreview);
-      setIsUploadingBanner(true);
-    }
-
-    setError('');
-
-    const formData = new FormData();
-    formData.append('file', file);
-
-    try {
-      const { data } = await api.post<{ url: string }>(endpoint, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-
-      if (type === 'poster') {
-        setPosterPreviewUrl(data.url);
-      } else {
-        setBannerPreviewUrl(data.url);
-      }
-
-      setForm((prev) => ({
-        ...prev,
-        posterUrl: type === 'poster' ? data.url : prev.posterUrl,
-        bannerUrl: type === 'banner' ? data.url : prev.bannerUrl,
-      }));
-    } catch (err) {
-      if (type === 'poster') {
-        setPosterPreviewUrl('');
-      } else {
-        setBannerPreviewUrl('');
-      }
-
-      if (axios.isAxiosError(err)) {
-        const message = Array.isArray(err.response?.data?.message)
-          ? err.response?.data?.message[0]
-          : err.response?.data?.message;
-
-        setError(message || `Failed to upload ${type}`);
-      } else {
-        setError(`Failed to upload ${type}`);
-      }
-    } finally {
-      if (type === 'poster') {
-        setIsUploadingPoster(false);
-      } else {
-        setIsUploadingBanner(false);
-      }
-    }
-  }
-
-  async function handlePosterSelect(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    await uploadImage(file, '/uploads/event-poster', 'poster');
-    e.target.value = '';
-  }
-
-  async function handleBannerSelect(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    await uploadImage(file, '/uploads/event-banner', 'banner');
-    e.target.value = '';
-  }
-
-  async function handlePosterDrop(e: React.DragEvent<HTMLDivElement>) {
-    e.preventDefault();
-    setIsDraggingPoster(false);
-
-    const file = e.dataTransfer.files?.[0];
-    if (!file) return;
-
-    await uploadImage(file, '/uploads/event-poster', 'poster');
-  }
-
-  async function handleBannerDrop(e: React.DragEvent<HTMLDivElement>) {
-    e.preventDefault();
-    setIsDraggingBanner(false);
-
-    const file = e.dataTransfer.files?.[0];
-    if (!file) return;
-
-    await uploadImage(file, '/uploads/event-banner', 'banner');
-  }
-
-  function openPosterPicker() {
-    posterInputRef.current?.click();
-  }
-
-  function openBannerPicker() {
-    bannerInputRef.current?.click();
-  }
-
-  function toIsoOrEmpty(value: string) {
-    if (!value) return '';
-    return new Date(value).toISOString();
-  }
-
-  function getFormatLabel() {
-    return FORMAT_OPTIONS.find((item) => item.value === form.format)?.label || 'Choose Format';
-  }
-
-  function getCategoryLabel() {
-    return CATEGORY_OPTIONS.find((item) => item.value === form.category)?.label || 'Choose Theme';
-  }
-
-  function getVisibilityLabel() {
-    return (
-      VISIBILITY_OPTIONS.find((item) => item.value === form.visitorsVisibility)?.label ||
-      'Choose Visibility'
+    const [placeSuggestions, setPlaceSuggestions] = useState<PlaceSuggestion[]>(
+        [],
     );
-  }
+    const [isPlaceOpen, setIsPlaceOpen] = useState(false);
+    const [isPlaceLoading, setIsPlaceLoading] = useState(false);
 
-  async function handleCreateEvent(e: React.FormEvent) {
-    e.preventDefault();
+    const placeRef = useRef<HTMLDivElement | null>(null);
 
-    if (!form.title.trim()) {
-      setError('Title is required');
-      return;
+    const [error, setError] = useState('');
+
+    useEffect(() => {
+        if (!error) return;
+
+        const timer = setTimeout(() => {
+            setError('');
+        }, 3000);
+
+        return () => clearTimeout(timer);
+    }, [error]);
+
+    useEffect(() => {
+        const trimmed = form.location.trim();
+
+        if (!trimmed) {
+            setPlaceSuggestions([]);
+            setIsPlaceOpen(false);
+            return;
+        }
+
+        const timeoutId = window.setTimeout(async () => {
+            try {
+                setIsPlaceLoading(true);
+
+                const suggestions = await searchPlaces(trimmed, {
+                    limit: 6,
+                    onlyUSA: true,
+                });
+
+                setPlaceSuggestions(suggestions);
+                setIsPlaceOpen(true);
+            } catch (error) {
+                console.error('Failed to load place suggestions', error);
+                setPlaceSuggestions([]);
+                setIsPlaceOpen(false);
+            } finally {
+                setIsPlaceLoading(false);
+            }
+        }, 450);
+
+        return () => window.clearTimeout(timeoutId);
+    }, [form.location]);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (
+                placeRef.current &&
+                !placeRef.current.contains(event.target as Node)
+            ) {
+                setIsPlaceOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
+    function handleSelectPlace(suggestion: PlaceSuggestion) {
+        setForm((prev) => ({
+            ...prev,
+            location: suggestion.placeAddress,
+            placeName: suggestion.placeName,
+            placeAddress: suggestion.placeAddress,
+            placeLat: suggestion.lat || '',
+            placeLng: suggestion.lng || '',
+            googlePlaceId: '',
+            googleMapsUrl: '',
+        }));
+
+        setIsPlaceOpen(false);
     }
 
-    if (!form.description.trim()) {
-      setError('Description is required');
-      return;
-    }
+    function handleChange(
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    ) {
+        const { name, value, type } = e.target as HTMLInputElement;
 
-    if (!form.location.trim()) {
-      setError('Location is required');
-      return;
-    }
+        setForm((prev) => {
+            if (name === 'location') {
+                return {
+                    ...prev,
+                    location: value,
+                    placeName: '',
+                    placeAddress: '',
+                    placeLat: '',
+                    placeLng: '',
+                    googlePlaceId: '',
+                    googleMapsUrl: '',
+                };
+            }
 
-    if (!form.startsAt || !form.endsAt) {
-      setError('Start date and end date are required');
-      return;
-    }
-
-    if (!form.format) {
-      setError('Format is required');
-      return;
-    }
-
-    if (!form.category) {
-      setError('Theme is required');
-      return;
-    }
-
-    if (!form.price.trim()) {
-      setError('Price is required');
-      return;
-    }
-
-    if (!form.ticketsLimit.trim()) {
-      setError('Quantity is required');
-      return;
-    }
-
-    const invalidPromo = promoCodes.some(
-      (item) =>
-        (item.code.trim() && !item.discountPercent.trim()) ||
-        (!item.code.trim() && item.discountPercent.trim()),
-    );
-
-    if (invalidPromo) {
-      setError('Fill promo code name and discount percent together');
-      return;
-    }
-
-    try {
-      setIsCreatingEvent(true);
-      setError('');
-
-      const createdEvent = await eventsApi.createEvent({
-        title: form.title.trim(),
-        description: form.description.trim(),
-        format: form.format,
-        category: form.category,
-        bannerUrl: form.bannerUrl || defaultBannerUrl,
-        posterUrl: form.posterUrl || defaultPosterUrl,
-        placeName: form.location.trim(),
-        placeAddress: form.location.trim(),
-        startsAt: toIsoOrEmpty(form.startsAt),
-        endsAt: toIsoOrEmpty(form.endsAt),
-        publishedAt: form.publishedAt ? toIsoOrEmpty(form.publishedAt) : undefined,
-        price: form.price.trim(),
-        ticketsLimit: Number(form.ticketsLimit),
-        visitorsVisibility: form.visitorsVisibility,
-        notifyOnNewVisitor: form.notifyOnNewVisitor,
-      });
-
-      const validPromoCodes = promoCodes.filter(
-        (item) => item.code.trim() && item.discountPercent.trim(),
-      );
-
-      for (const promo of validPromoCodes) {
-        await promoCodesApi.createPromoCode({
-          eventId: createdEvent.id,
-          code: promo.code.trim().toUpperCase(),
-          discountPercent: Number(promo.discountPercent),
+            return {
+                ...prev,
+                [name]:
+                    type === 'checkbox'
+                        ? (e.target as HTMLInputElement).checked
+                        : value,
+            };
         });
-      }
-
-      navigate('/account', { replace: true });
-    } catch (err) {
-      if (axios.isAxiosError(err)) {
-        const message = Array.isArray(err.response?.data?.message)
-          ? err.response?.data?.message[0]
-          : err.response?.data?.message;
-
-        setError(message || 'Failed to create event');
-      } else {
-        setError('Failed to create event');
-      }
-    } finally {
-      setIsCreatingEvent(false);
     }
-  }
 
-  return (
-    <main className="create-event-page">
-      <div className="create-event-page__inner">
-        <form className="create-event-form" onSubmit={handleCreateEvent}>
-          <div className="create-event-form__header">
-            <h1 className="create-event-form__title">Create Event</h1>
-          </div>
+    function handlePromoCodeChange(
+        index: number,
+        field: keyof PromoCodeFormItem,
+        value: string,
+    ) {
+        setPromoCodes((prev) =>
+            prev.map((item, i) =>
+                i === index ? { ...item, [field]: value } : item,
+            ),
+        );
+    }
 
-          <div className="create-event-form__grid">
-            <div className="create-event-media">
-              <div className="create-event-media__poster-block">
-                <div
-                  className={`event-upload event-upload--poster ${isDraggingPoster ? 'is-dragging' : ''} ${posterPreviewUrl ? 'has-image' : 'has-placeholder'}`}
-                  onClick={openPosterPicker}
-                  onDrop={handlePosterDrop}
-                  onDragOver={(e) => {
-                    e.preventDefault();
-                    setIsDraggingPoster(true);
-                  }}
-                  onDragLeave={(e) => {
-                    e.preventDefault();
-                    setIsDraggingPoster(false);
-                  }}
-                  role="button"
-                  tabIndex={0}
+    function addPromoCodeRow() {
+        setPromoCodes((prev) => [...prev, { code: '', discountPercent: '' }]);
+    }
+
+    function removePromoCodeRow(index: number) {
+        setPromoCodes((prev) => prev.filter((_, i) => i !== index));
+    }
+
+    function handleStartsAtChange(date: Date | null) {
+        setForm((prev) => {
+            const nextStartsAt = date ? formatDateTimeLocal(date) : '';
+            const prevEndsAtDate = parseDateTimeLocal(prev.endsAt);
+
+            return {
+                ...prev,
+                startsAt: nextStartsAt,
+                endsAt:
+                    date &&
+                    prevEndsAtDate &&
+                    prevEndsAtDate.getTime() < date.getTime()
+                        ? ''
+                        : prev.endsAt,
+            };
+        });
+    }
+
+    function handleEndsAtChange(date: Date | null) {
+        setForm((prev) => ({
+            ...prev,
+            endsAt: date ? formatDateTimeLocal(date) : '',
+        }));
+    }
+
+    function handlePublishedAtChange(date: Date | null) {
+        setForm((prev) => ({
+            ...prev,
+            publishedAt: date ? formatDateTimeLocal(date) : '',
+        }));
+    }
+
+    async function uploadImage(
+        file: File,
+        endpoint: '/uploads/event-poster' | '/uploads/event-banner',
+        type: 'poster' | 'banner',
+    ) {
+        const allowedTypes = [
+            'image/jpeg',
+            'image/jpg',
+            'image/png',
+            'image/webp',
+        ];
+
+        if (!allowedTypes.includes(file.type)) {
+            setError('Only jpg, jpeg, png and webp images are allowed');
+            return;
+        }
+
+        const maxSize = type === 'poster' ? 7 * 1024 * 1024 : 10 * 1024 * 1024;
+
+        if (file.size > maxSize) {
+            setError(
+                `${type === 'poster' ? 'Poster' : 'Banner'} size must be up to ${
+                    type === 'poster' ? '7' : '10'
+                } MB`,
+            );
+            return;
+        }
+
+        const localPreview = URL.createObjectURL(file);
+
+        if (type === 'poster') {
+            setPosterPreviewUrl(localPreview);
+            setIsUploadingPoster(true);
+        } else {
+            setBannerPreviewUrl(localPreview);
+            setIsUploadingBanner(true);
+        }
+
+        setError('');
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const { data } = await api.post<{ url: string }>(
+                endpoint,
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                },
+            );
+
+            if (type === 'poster') {
+                setPosterPreviewUrl(data.url);
+            } else {
+                setBannerPreviewUrl(data.url);
+            }
+
+            setForm((prev) => ({
+                ...prev,
+                posterUrl: type === 'poster' ? data.url : prev.posterUrl,
+                bannerUrl: type === 'banner' ? data.url : prev.bannerUrl,
+            }));
+        } catch (err) {
+            if (type === 'poster') {
+                setPosterPreviewUrl('');
+            } else {
+                setBannerPreviewUrl('');
+            }
+
+            if (axios.isAxiosError(err)) {
+                const message = Array.isArray(err.response?.data?.message)
+                    ? err.response?.data?.message[0]
+                    : err.response?.data?.message;
+
+                setError(message || `Failed to upload ${type}`);
+            } else {
+                setError(`Failed to upload ${type}`);
+            }
+        } finally {
+            if (type === 'poster') {
+                setIsUploadingPoster(false);
+            } else {
+                setIsUploadingBanner(false);
+            }
+        }
+    }
+
+    async function handlePosterSelect(e: React.ChangeEvent<HTMLInputElement>) {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        await uploadImage(file, '/uploads/event-poster', 'poster');
+        e.target.value = '';
+    }
+
+    async function handleBannerSelect(e: React.ChangeEvent<HTMLInputElement>) {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        await uploadImage(file, '/uploads/event-banner', 'banner');
+        e.target.value = '';
+    }
+
+    async function handlePosterDrop(e: React.DragEvent<HTMLDivElement>) {
+        e.preventDefault();
+        setIsDraggingPoster(false);
+
+        const file = e.dataTransfer.files?.[0];
+        if (!file) return;
+
+        await uploadImage(file, '/uploads/event-poster', 'poster');
+    }
+
+    async function handleBannerDrop(e: React.DragEvent<HTMLDivElement>) {
+        e.preventDefault();
+        setIsDraggingBanner(false);
+
+        const file = e.dataTransfer.files?.[0];
+        if (!file) return;
+
+        await uploadImage(file, '/uploads/event-banner', 'banner');
+    }
+
+    function openPosterPicker() {
+        posterInputRef.current?.click();
+    }
+
+    function openBannerPicker() {
+        bannerInputRef.current?.click();
+    }
+
+    function toIsoOrEmpty(value: string) {
+        if (!value) return '';
+        return new Date(value).toISOString();
+    }
+
+    function getFormatLabel() {
+        return (
+            FORMAT_OPTIONS.find((item) => item.value === form.format)?.label ||
+            'Choose Format'
+        );
+    }
+
+    function getCategoryLabel() {
+        return (
+            CATEGORY_OPTIONS.find((item) => item.value === form.category)
+                ?.label || 'Choose Theme'
+        );
+    }
+
+    function getVisibilityLabel() {
+        return (
+            VISIBILITY_OPTIONS.find(
+                (item) => item.value === form.visitorsVisibility,
+            )?.label || 'Choose Visibility'
+        );
+    }
+
+    async function handleCreateEvent(e: React.FormEvent) {
+        e.preventDefault();
+
+        if (!form.title.trim()) {
+            setError('Title is required');
+            return;
+        }
+
+        if (!form.description.trim()) {
+            setError('Description is required');
+            return;
+        }
+
+        if (!form.location.trim()) {
+            setError('Location is required');
+            return;
+        }
+
+        if (!form.startsAt || !form.endsAt) {
+            setError('Start date and end date are required');
+            return;
+        }
+
+        if (!form.format) {
+            setError('Format is required');
+            return;
+        }
+
+        if (!form.category) {
+            setError('Theme is required');
+            return;
+        }
+
+        if (!form.price.trim()) {
+            setError('Price is required');
+            return;
+        }
+
+        if (!form.ticketsLimit.trim()) {
+            setError('Quantity is required');
+            return;
+        }
+
+        const invalidPromo = promoCodes.some(
+            (item) =>
+                (item.code.trim() && !item.discountPercent.trim()) ||
+                (!item.code.trim() && item.discountPercent.trim()),
+        );
+
+        if (invalidPromo) {
+            setError('Fill promo code name and discount percent together');
+            return;
+        }
+
+        if (
+            form.redirectAfterPurchaseUrl.trim() &&
+            !/^https?:\/\/.+/i.test(form.redirectAfterPurchaseUrl.trim())
+        ) {
+            setError('Redirect URL must start with http:// or https://');
+            return;
+        }
+
+        try {
+            setIsCreatingEvent(true);
+            setError('');
+
+            const createdEvent = await eventsApi.createEvent({
+                title: form.title.trim(),
+                description: form.description.trim(),
+                format: form.format,
+                category: form.category,
+                bannerUrl: form.bannerUrl || defaultBannerUrl,
+                posterUrl: form.posterUrl || defaultPosterUrl,
+                placeName: form.placeName || form.location.trim(),
+                placeAddress: form.placeAddress || form.location.trim(),
+                placeLat: form.placeLat || undefined,
+                placeLng: form.placeLng || undefined,
+                googlePlaceId: form.googlePlaceId || undefined,
+                googleMapsUrl: form.googleMapsUrl || undefined,
+                startsAt: toIsoOrEmpty(form.startsAt),
+                endsAt: toIsoOrEmpty(form.endsAt),
+                publishedAt: form.publishedAt
+                    ? toIsoOrEmpty(form.publishedAt)
+                    : undefined,
+                redirectAfterPurchaseUrl:
+                    form.redirectAfterPurchaseUrl.trim() || undefined,
+                price: form.price.trim(),
+                ticketsLimit: Number(form.ticketsLimit),
+                visitorsVisibility: form.visitorsVisibility,
+                notifyOnNewVisitor: form.notifyOnNewVisitor,
+            });
+
+            const validPromoCodes = promoCodes.filter(
+                (item) => item.code.trim() && item.discountPercent.trim(),
+            );
+
+            for (const promo of validPromoCodes) {
+                await promoCodesApi.createPromoCode({
+                    eventId: createdEvent.id,
+                    code: promo.code.trim().toUpperCase(),
+                    discountPercent: Number(promo.discountPercent),
+                });
+            }
+
+            navigate('/account', { replace: true });
+        } catch (err) {
+            if (axios.isAxiosError(err)) {
+                const message = Array.isArray(err.response?.data?.message)
+                    ? err.response?.data?.message[0]
+                    : err.response?.data?.message;
+
+                setError(message || 'Failed to create event');
+            } else {
+                setError('Failed to create event');
+            }
+        } finally {
+            setIsCreatingEvent(false);
+        }
+    }
+
+    return (
+        <main className="create-event-page">
+            <div className="create-event-page__inner">
+                <form
+                    className="create-event-form"
+                    onSubmit={handleCreateEvent}
                 >
-                  <img
-                    src={posterPreviewUrl || posterPlaceholder}
-                    alt="Event poster"
-                    className={posterPreviewUrl ? 'event-upload__image' : 'event-upload__icon'}
-                  />
-                  <div className="event-upload__shade" />
-                  <div className="event-upload__overlay-text">
-                    {isUploadingPoster ? (
-                      <div className="event-upload__overlay-text">Uploading...</div>
-                    ) : null}
-                  </div>
-                </div>
-
-                <input
-                  ref={posterInputRef}
-                  type="file"
-                  accept=".jpg,.jpeg,.png,.webp"
-                  onChange={handlePosterSelect}
-                  className="event-upload__input"
-                />
-              </div>
-
-              <div className="create-event-media__banner-row">
-                <div className="create-event-media__banner-main">
-                  <div className="create-event-media__banner-label">BANNER</div>
-
-                  <div
-                    className={`event-upload event-upload--banner ${isDraggingBanner ? 'is-dragging' : ''} ${bannerPreviewUrl ? 'has-image' : 'has-placeholder'}`}
-                    onClick={openBannerPicker}
-                    onDrop={handleBannerDrop}
-                    onDragOver={(e) => {
-                      e.preventDefault();
-                      setIsDraggingBanner(true);
-                    }}
-                    onDragLeave={(e) => {
-                      e.preventDefault();
-                      setIsDraggingBanner(false);
-                    }}
-                    role="button"
-                    tabIndex={0}
-                  >
-                    <img
-                      src={bannerPreviewUrl || bannerPlaceholder}
-                      alt="Event banner"
-                      className={bannerPreviewUrl ? 'event-upload__image' : 'event-upload__icon'}
-                    />
-                    <div className="event-upload__shade" />
-                    <div className="event-upload__overlay-text">
-                      {isUploadingBanner ? (
-                        <div className="event-upload__overlay-text">Uploading...</div>
-                      ) : null}
+                    <div className="create-event-form__header">
+                        <h1 className="create-event-form__title">
+                            Create Event
+                        </h1>
                     </div>
-                  </div>
 
-                  <input
-                    ref={bannerInputRef}
-                    type="file"
-                    accept=".jpg,.jpeg,.png,.webp"
-                    onChange={handleBannerSelect}
-                    className="event-upload__input"
-                  />
-                </div>
+                    <div className="create-event-form__grid">
+                        <div className="create-event-media">
+                            <div className="create-event-media__poster-block">
+                                <div
+                                    className={`event-upload event-upload--poster ${isDraggingPoster ? 'is-dragging' : ''} ${posterPreviewUrl ? 'has-image' : 'has-placeholder'}`}
+                                    onClick={openPosterPicker}
+                                    onDrop={handlePosterDrop}
+                                    onDragOver={(e) => {
+                                        e.preventDefault();
+                                        setIsDraggingPoster(true);
+                                    }}
+                                    onDragLeave={(e) => {
+                                        e.preventDefault();
+                                        setIsDraggingPoster(false);
+                                    }}
+                                    role="button"
+                                    tabIndex={0}
+                                >
+                                    <img
+                                        src={
+                                            posterPreviewUrl ||
+                                            posterPlaceholder
+                                        }
+                                        alt="Event poster"
+                                        className={
+                                            posterPreviewUrl
+                                                ? 'event-upload__image'
+                                                : 'event-upload__icon'
+                                        }
+                                    />
+                                    <div className="event-upload__shade" />
+                                    <div className="event-upload__overlay-text">
+                                        {isUploadingPoster ? (
+                                            <div className="event-upload__overlay-text">
+                                                Uploading...
+                                            </div>
+                                        ) : null}
+                                    </div>
+                                </div>
 
-                <div className="event-field promo-field promo-field--side">
-                  <span className="event-field__label">PROMO CODE</span>
+                                <input
+                                    ref={posterInputRef}
+                                    type="file"
+                                    accept=".jpg,.jpeg,.png,.webp"
+                                    onChange={handlePosterSelect}
+                                    className="event-upload__input"
+                                />
+                            </div>
 
-                  {promoCodes.map((item, index) => (
-                    <div key={index} className="promo-field__row">
-                      <input
-                        type="text"
-                        value={item.code}
-                        onChange={(e) => handlePromoCodeChange(index, 'code', e.target.value)}
-                        placeholder="Add"
-                        className="event-field__input promo-field__code"
-                      />
+                            <div className="create-event-media__banner-row">
+                                <div className="create-event-media__banner-main">
+                                    <div className="create-event-media__banner-label">
+                                        BANNER
+                                    </div>
 
-                      <div className="promo-field__discount-wrap">
-                        <span className="promo-field__prefix">%</span>
-                        <input
-                          type="number"
-                          min="1"
-                          max="100"
-                          value={item.discountPercent}
-                          onChange={(e) =>
-                            handlePromoCodeChange(index, 'discountPercent', e.target.value)
-                          }
-                          className="event-field__input promo-field__discount promo-field__discount--with-prefix"
-                        />
-                      </div>
+                                    <div
+                                        className={`event-upload event-upload--banner ${isDraggingBanner ? 'is-dragging' : ''} ${bannerPreviewUrl ? 'has-image' : 'has-placeholder'}`}
+                                        onClick={openBannerPicker}
+                                        onDrop={handleBannerDrop}
+                                        onDragOver={(e) => {
+                                            e.preventDefault();
+                                            setIsDraggingBanner(true);
+                                        }}
+                                        onDragLeave={(e) => {
+                                            e.preventDefault();
+                                            setIsDraggingBanner(false);
+                                        }}
+                                        role="button"
+                                        tabIndex={0}
+                                    >
+                                        <img
+                                            src={
+                                                bannerPreviewUrl ||
+                                                bannerPlaceholder
+                                            }
+                                            alt="Event banner"
+                                            className={
+                                                bannerPreviewUrl
+                                                    ? 'event-upload__image'
+                                                    : 'event-upload__icon'
+                                            }
+                                        />
+                                        <div className="event-upload__shade" />
+                                        <div className="event-upload__overlay-text">
+                                            {isUploadingBanner ? (
+                                                <div className="event-upload__overlay-text">
+                                                    Uploading...
+                                                </div>
+                                            ) : null}
+                                        </div>
+                                    </div>
 
-                      {index === promoCodes.length - 1 ? (
-                        <button
-                          type="button"
-                          className="promo-field__action"
-                          onClick={addPromoCodeRow}
-                        >
-                          +
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          className="promo-field__action"
-                          onClick={() => removePromoCodeRow(index)}
-                        >
-                          −
-                        </button>
-                      )}
+                                    <input
+                                        ref={bannerInputRef}
+                                        type="file"
+                                        accept=".jpg,.jpeg,.png,.webp"
+                                        onChange={handleBannerSelect}
+                                        className="event-upload__input"
+                                    />
+                                </div>
+
+                                <div className="event-field promo-field promo-field--side">
+                                    <span className="event-field__label">
+                                        PROMO CODE
+                                    </span>
+
+                                    {promoCodes.map((item, index) => (
+                                        <div
+                                            key={index}
+                                            className="promo-field__row"
+                                        >
+                                            <input
+                                                type="text"
+                                                value={item.code}
+                                                onChange={(e) =>
+                                                    handlePromoCodeChange(
+                                                        index,
+                                                        'code',
+                                                        e.target.value,
+                                                    )
+                                                }
+                                                placeholder="Add"
+                                                className="event-field__input promo-field__code"
+                                            />
+
+                                            <div className="promo-field__discount-wrap">
+                                                <span className="promo-field__prefix">
+                                                    %
+                                                </span>
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    max="100"
+                                                    value={item.discountPercent}
+                                                    onChange={(e) =>
+                                                        handlePromoCodeChange(
+                                                            index,
+                                                            'discountPercent',
+                                                            e.target.value,
+                                                        )
+                                                    }
+                                                    className="event-field__input promo-field__discount promo-field__discount--with-prefix"
+                                                />
+                                            </div>
+
+                                            {index === promoCodes.length - 1 ? (
+                                                <button
+                                                    type="button"
+                                                    className="promo-field__action"
+                                                    onClick={addPromoCodeRow}
+                                                >
+                                                    +
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    type="button"
+                                                    className="promo-field__action"
+                                                    onClick={() =>
+                                                        removePromoCodeRow(
+                                                            index,
+                                                        )
+                                                    }
+                                                >
+                                                    −
+                                                </button>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="create-event-fields">
+                            <div className="create-event-fields__left">
+                                <label className="event-field">
+                                    <span className="event-field__label">
+                                        TITLE
+                                    </span>
+                                    <input
+                                        type="text"
+                                        name="title"
+                                        value={form.title}
+                                        onChange={handleChange}
+                                        placeholder="Add Title"
+                                        className="event-field__input event-field__input--wide"
+                                    />
+                                </label>
+
+                                <label className="event-field">
+                                    <span className="event-field__label">
+                                        DESCRIPTION
+                                    </span>
+                                    <textarea
+                                        name="description"
+                                        value={form.description}
+                                        onChange={handleChange}
+                                        placeholder="Add Description"
+                                        className="event-field__textarea event-field__textarea--wide"
+                                    />
+                                </label>
+
+                                <div className="event-field" ref={placeRef}>
+                                    <span className="event-field__label">
+                                        LOCATION
+                                    </span>
+
+                                    <input
+                                        type="text"
+                                        name="location"
+                                        value={form.location}
+                                        onChange={handleChange}
+                                        onFocus={() => {
+                                            if (placeSuggestions.length > 0) {
+                                                setIsPlaceOpen(true);
+                                            }
+                                        }}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                setIsPlaceOpen(false);
+                                            }
+                                        }}
+                                        placeholder="Add Location"
+                                        className="event-field__input event-field__input--wide"
+                                        autoComplete="off"
+                                    />
+
+                                    {isPlaceOpen && (
+                                        <div className="event-field__suggestions">
+                                            {isPlaceLoading ? (
+                                                <div className="event-field__suggestion event-field__suggestion--muted">
+                                                    Loading...
+                                                </div>
+                                            ) : placeSuggestions.length > 0 ? (
+                                                placeSuggestions.map(
+                                                    (suggestion) => (
+                                                        <button
+                                                            key={suggestion.id}
+                                                            type="button"
+                                                            className="event-field__suggestion"
+                                                            onClick={() =>
+                                                                handleSelectPlace(
+                                                                    suggestion,
+                                                                )
+                                                            }
+                                                        >
+                                                            {suggestion.label}
+                                                        </button>
+                                                    ),
+                                                )
+                                            ) : (
+                                                <div className="event-field__suggestion event-field__suggestion--muted">
+                                                    No places found
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="create-event-fields__row create-event-fields__row--price">
+                                    <label className="event-field">
+                                        <span className="event-field__label">
+                                            PRICE
+                                        </span>
+
+                                        <div className="event-field__input-wrap">
+                                            <span className="event-field__prefix">
+                                                $
+                                            </span>
+                                            <input
+                                                type="text"
+                                                name="price"
+                                                value={form.price}
+                                                onChange={handleChange}
+                                                placeholder="Add Price"
+                                                className="event-field__input event-field__input--short event-field__input--with-prefix"
+                                            />
+                                        </div>
+                                    </label>
+
+                                    <label className="event-field">
+                                        <span className="event-field__label">
+                                            QUANTITY
+                                        </span>
+                                        <input
+                                            type="number"
+                                            min="1"
+                                            name="ticketsLimit"
+                                            value={form.ticketsLimit}
+                                            onChange={handleChange}
+                                            placeholder="Add Quantity"
+                                            className="event-field__input event-field__input--short"
+                                        />
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div className="create-event-fields__right">
+                                <div className="event-field">
+                                    <span className="event-field__label">
+                                        DATE
+                                    </span>
+
+                                    <div className="create-event-fields__row create-event-fields__row--dates">
+                                        <div className="event-field__date-picker">
+                                            <DatePicker
+                                                selected={parseDateTimeLocal(
+                                                    form.startsAt,
+                                                )}
+                                                onChange={handleStartsAtChange}
+                                                showTimeSelect
+                                                timeIntervals={15}
+                                                dateFormat="MM/dd/yyyy h:mm aa"
+                                                placeholderText="Start in"
+                                                customInput={
+                                                    <CustomDateInput
+                                                        placeholder="Start in"
+                                                        selectedValue={
+                                                            form.startsAt
+                                                        }
+                                                        className="event-field__input--date"
+                                                    />
+                                                }
+                                            />
+                                        </div>
+
+                                        <div className="event-field__date-picker">
+                                            <DatePicker
+                                                selected={parseDateTimeLocal(
+                                                    form.endsAt,
+                                                )}
+                                                onChange={handleEndsAtChange}
+                                                showTimeSelect
+                                                timeIntervals={15}
+                                                dateFormat="MM/dd/yyyy h:mm aa"
+                                                minDate={
+                                                    parseDateTimeLocal(
+                                                        form.startsAt,
+                                                    ) || undefined
+                                                }
+                                                placeholderText="End in"
+                                                customInput={
+                                                    <CustomDateInput
+                                                        placeholder="End in"
+                                                        selectedValue={
+                                                            form.endsAt
+                                                        }
+                                                        className="event-field__input--date"
+                                                    />
+                                                }
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="event-field event-select">
+                                    <span className="event-field__label">
+                                        FORMAT
+                                    </span>
+                                    <button
+                                        type="button"
+                                        className="event-select__trigger"
+                                        onClick={() => {
+                                            setIsFormatOpen((prev) => !prev);
+                                            setIsCategoryOpen(false);
+                                            setIsVisibilityOpen(false);
+                                        }}
+                                    >
+                                        <span>{getFormatLabel()}</span>
+                                        <img
+                                            src={selectArrow}
+                                            alt=""
+                                            className="event-select__arrow"
+                                        />
+                                    </button>
+
+                                    {isFormatOpen && (
+                                        <div className="event-select__menu">
+                                            {FORMAT_OPTIONS.map((item) => (
+                                                <button
+                                                    key={item.value}
+                                                    type="button"
+                                                    className="event-select__item"
+                                                    onClick={() => {
+                                                        setForm((prev) => ({
+                                                            ...prev,
+                                                            format: item.value,
+                                                        }));
+                                                        setIsFormatOpen(false);
+                                                    }}
+                                                >
+                                                    {item.label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="event-field event-select">
+                                    <span className="event-field__label">
+                                        THEME
+                                    </span>
+                                    <button
+                                        type="button"
+                                        className="event-select__trigger"
+                                        onClick={() => {
+                                            setIsCategoryOpen((prev) => !prev);
+                                            setIsFormatOpen(false);
+                                            setIsVisibilityOpen(false);
+                                        }}
+                                    >
+                                        <span>{getCategoryLabel()}</span>
+                                        <img
+                                            src={selectArrow}
+                                            alt=""
+                                            className="event-select__arrow"
+                                        />
+                                    </button>
+
+                                    {isCategoryOpen && (
+                                        <div className="event-select__menu">
+                                            {CATEGORY_OPTIONS.map((item) => (
+                                                <button
+                                                    key={item.value}
+                                                    type="button"
+                                                    className="event-select__item"
+                                                    onClick={() => {
+                                                        setForm((prev) => ({
+                                                            ...prev,
+                                                            category:
+                                                                item.value,
+                                                        }));
+                                                        setIsCategoryOpen(
+                                                            false,
+                                                        );
+                                                    }}
+                                                >
+                                                    {item.label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="create-event-bottom">
+                            <div className="create-event-bottom__left">
+                                <label className="event-field">
+                                    <span className="event-field__label">
+                                        DATE OF PUBLICATION
+                                    </span>
+
+                                    <div className="event-field__publication-picker">
+                                        <DatePicker
+                                            selected={parseDateTimeLocal(
+                                                form.publishedAt,
+                                            )}
+                                            onChange={handlePublishedAtChange}
+                                            showTimeSelect
+                                            timeIntervals={15}
+                                            dateFormat="MM/dd/yyyy h:mm aa"
+                                            placeholderText="Add Date"
+                                            customInput={
+                                                <CustomDateInput
+                                                    placeholder="Add Date"
+                                                    selectedValue={
+                                                        form.publishedAt
+                                                    }
+                                                    className="event-field__input--publication"
+                                                />
+                                            }
+                                        />
+                                    </div>
+                                </label>
+
+                                <label className="event-field">
+                                    <span className="event-field__label">
+                                        REDIRECT AFTER PURCHASE
+                                    </span>
+                                    <input
+                                        type="url"
+                                        name="redirectAfterPurchaseUrl"
+                                        value={form.redirectAfterPurchaseUrl}
+                                        onChange={handleChange}
+                                        placeholder="https://example.com"
+                                        className="event-field__input event-field__input--redirect"
+                                    />
+                                </label>
+
+                                <div className="event-field event-select event-select--visibility">
+                                    <span className="event-field__label">
+                                        VISIBILITY OF ATTENDEES
+                                    </span>
+                                    <button
+                                        type="button"
+                                        className="event-select__trigger"
+                                        onClick={() => {
+                                            setIsVisibilityOpen(
+                                                (prev) => !prev,
+                                            );
+                                            setIsFormatOpen(false);
+                                            setIsCategoryOpen(false);
+                                        }}
+                                    >
+                                        <span>{getVisibilityLabel()}</span>
+                                        <img
+                                            src={selectArrow}
+                                            alt=""
+                                            className="event-select__arrow"
+                                        />
+                                    </button>
+
+                                    {isVisibilityOpen && (
+                                        <div className="event-select__menu">
+                                            {VISIBILITY_OPTIONS.map((item) => (
+                                                <button
+                                                    key={item.value}
+                                                    type="button"
+                                                    className="event-select__item"
+                                                    onClick={() => {
+                                                        setForm((prev) => ({
+                                                            ...prev,
+                                                            visitorsVisibility:
+                                                                item.value,
+                                                        }));
+                                                        setIsVisibilityOpen(
+                                                            false,
+                                                        );
+                                                    }}
+                                                >
+                                                    {item.label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="create-event-bottom__right">
+                                <label className="event-checkbox">
+                                    <input
+                                        type="checkbox"
+                                        name="notifyOnNewVisitor"
+                                        checked={form.notifyOnNewVisitor}
+                                        onChange={handleChange}
+                                    />
+                                    <span>
+                                        Receive notifications about new
+                                        attendees to your event
+                                    </span>
+                                </label>
+
+                                <button
+                                    type="submit"
+                                    className="create-event-form__submit"
+                                    disabled={
+                                        isCreatingEvent ||
+                                        isUploadingPoster ||
+                                        isUploadingBanner
+                                    }
+                                >
+                                    {isCreatingEvent ? 'Creating...' : 'Create'}
+                                    <img
+                                        src={Arrow2}
+                                        alt=""
+                                        className="event-select__arrow"
+                                    />
+                                </button>
+                            </div>
+                        </div>
+
+                        {error ? (
+                            <p className="create-event-form__error">{error}</p>
+                        ) : null}
                     </div>
-                  ))}
-                </div>
-              </div>
+                </form>
             </div>
-
-            <div className="create-event-fields">
-              <div className="create-event-fields__left">
-                <label className="event-field">
-                  <span className="event-field__label">TITLE</span>
-                  <input
-                    type="text"
-                    name="title"
-                    value={form.title}
-                    onChange={handleChange}
-                    placeholder="Add Title"
-                    className="event-field__input event-field__input--wide"
-                  />
-                </label>
-
-                <label className="event-field">
-                  <span className="event-field__label">DESCRIPTION</span>
-                  <textarea
-                    name="description"
-                    value={form.description}
-                    onChange={handleChange}
-                    placeholder="Add Description"
-                    className="event-field__textarea event-field__textarea--wide"
-                  />
-                </label>
-
-                <label className="event-field">
-                  <span className="event-field__label">LOCATION</span>
-                  <input
-                    type="text"
-                    name="location"
-                    value={form.location}
-                    onChange={handleChange}
-                    placeholder="Add Location"
-                    className="event-field__input event-field__input--wide"
-                  />
-                </label>
-
-                <div className="create-event-fields__row create-event-fields__row--price">
-                  <label className="event-field">
-                    <span className="event-field__label">PRICE</span>
-
-                    <div className="event-field__input-wrap">
-                      <span className="event-field__prefix">$</span>
-                      <input
-                        type="text"
-                        name="price"
-                        value={form.price}
-                        onChange={handleChange}
-                        placeholder="Add Price"
-                        className="event-field__input event-field__input--short event-field__input--with-prefix"
-                      />
-                    </div>
-                  </label>
-
-                  <label className="event-field">
-                    <span className="event-field__label">QUANTITY</span>
-                    <input
-                      type="number"
-                      min="1"
-                      name="ticketsLimit"
-                      value={form.ticketsLimit}
-                      onChange={handleChange}
-                      placeholder="Add Quantity"
-                      className="event-field__input event-field__input--short"
-                    />
-                  </label>
-                </div>
-              </div>
-
-              <div className="create-event-fields__right">
-                <div className="event-field">
-                  <span className="event-field__label">DATE</span>
-
-                  <div className="create-event-fields__row create-event-fields__row--dates">
-                    <div className="event-field__date-picker">
-                      <DatePicker
-                        selected={parseDateTimeLocal(form.startsAt)}
-                        onChange={handleStartsAtChange}
-                        showTimeSelect
-                        timeIntervals={15}
-                        dateFormat="MM/dd/yyyy h:mm aa"
-                        placeholderText="Start in"
-                        customInput={
-                          <CustomDateInput
-                            placeholder="Start in"
-                            selectedValue={form.startsAt}
-                            className="event-field__input--date"
-                          />
-                        }
-                      />
-                    </div>
-
-                    <div className="event-field__date-picker">
-                      <DatePicker
-                        selected={parseDateTimeLocal(form.endsAt)}
-                        onChange={handleEndsAtChange}
-                        showTimeSelect
-                        timeIntervals={15}
-                        dateFormat="MM/dd/yyyy h:mm aa"
-                        minDate={parseDateTimeLocal(form.startsAt) || undefined}
-                        placeholderText="End in"
-                        customInput={
-                          <CustomDateInput
-                            placeholder="End in"
-                            selectedValue={form.endsAt}
-                            className="event-field__input--date"
-                          />
-                        }
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="event-field event-select">
-                  <span className="event-field__label">FORMAT</span>
-                  <button
-                    type="button"
-                    className="event-select__trigger"
-                    onClick={() => {
-                      setIsFormatOpen((prev) => !prev);
-                      setIsCategoryOpen(false);
-                      setIsVisibilityOpen(false);
-                    }}
-                  >
-                    <span>{getFormatLabel()}</span>
-                    <img src={selectArrow} alt="" className="event-select__arrow" />
-                  </button>
-
-                  {isFormatOpen && (
-                    <div className="event-select__menu">
-                      {FORMAT_OPTIONS.map((item) => (
-                        <button
-                          key={item.value}
-                          type="button"
-                          className="event-select__item"
-                          onClick={() => {
-                            setForm((prev) => ({ ...prev, format: item.value }));
-                            setIsFormatOpen(false);
-                          }}
-                        >
-                          {item.label}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                <div className="event-field event-select">
-                  <span className="event-field__label">THEME</span>
-                  <button
-                    type="button"
-                    className="event-select__trigger"
-                    onClick={() => {
-                      setIsCategoryOpen((prev) => !prev);
-                      setIsFormatOpen(false);
-                      setIsVisibilityOpen(false);
-                    }}
-                  >
-                    <span>{getCategoryLabel()}</span>
-                    <img src={selectArrow} alt="" className="event-select__arrow" />
-                  </button>
-
-                  {isCategoryOpen && (
-                    <div className="event-select__menu">
-                      {CATEGORY_OPTIONS.map((item) => (
-                        <button
-                          key={item.value}
-                          type="button"
-                          className="event-select__item"
-                          onClick={() => {
-                            setForm((prev) => ({ ...prev, category: item.value }));
-                            setIsCategoryOpen(false);
-                          }}
-                        >
-                          {item.label}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <div className="create-event-bottom">
-              <div className="create-event-bottom__left">
-                <label className="event-field">
-                  <span className="event-field__label">DATE OF PUBLICATION</span>
-
-                  <div className="event-field__publication-picker">
-                    <DatePicker
-                      selected={parseDateTimeLocal(form.publishedAt)}
-                      onChange={handlePublishedAtChange}
-                      showTimeSelect
-                      timeIntervals={15}
-                      dateFormat="MM/dd/yyyy h:mm aa"
-                      placeholderText="Add Date"
-                      customInput={
-                        <CustomDateInput
-                          placeholder="Add Date"
-                          selectedValue={form.publishedAt}
-                          className="event-field__input--publication"
-                        />
-                      }
-                    />
-                  </div>
-                </label>
-
-                <div className="event-field event-select event-select--visibility">
-                  <span className="event-field__label">VISIBILITY OF ATTENDEES</span>
-                  <button
-                    type="button"
-                    className="event-select__trigger"
-                    onClick={() => {
-                      setIsVisibilityOpen((prev) => !prev);
-                      setIsFormatOpen(false);
-                      setIsCategoryOpen(false);
-                    }}
-                  >
-                    <span>{getVisibilityLabel()}</span>
-                    <img src={selectArrow} alt="" className="event-select__arrow" />
-                  </button>
-
-                  {isVisibilityOpen && (
-                    <div className="event-select__menu">
-                      {VISIBILITY_OPTIONS.map((item) => (
-                        <button
-                          key={item.value}
-                          type="button"
-                          className="event-select__item"
-                          onClick={() => {
-                            setForm((prev) => ({
-                              ...prev,
-                              visitorsVisibility: item.value,
-                            }));
-                            setIsVisibilityOpen(false);
-                          }}
-                        >
-                          {item.label}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="create-event-bottom__right">
-                <label className="event-checkbox">
-                  <input
-                    type="checkbox"
-                    name="notifyOnNewVisitor"
-                    checked={form.notifyOnNewVisitor}
-                    onChange={handleChange}
-                  />
-                  <span>Receive notifications about new attendees to your event</span>
-                </label>
-
-                <button
-                  type="submit"
-                  className="create-event-form__submit"
-                  disabled={isCreatingEvent || isUploadingPoster || isUploadingBanner}
-                >
-                  {isCreatingEvent ? 'Creating...' : 'Create'}
-                  <img src={Arrow2} alt="" className="event-select__arrow" />
-                </button>
-              </div>
-            </div>
-
-            {error ? <p className="create-event-form__error">{error}</p> : null}
-          </div>
-        </form>
-      </div>
-    </main>
-  );
+        </main>
+    );
 }

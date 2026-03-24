@@ -1,3 +1,4 @@
+// src/types/company.types.ts
 export interface Company {
     id: string;
     ownerUserId: string;
@@ -20,6 +21,10 @@ export interface CreateCompanyPayload {
     description?: string;
     avatarUrl?: string;
     placeAddress?: string;
+    placeLat?: string;
+    placeLng?: string;
+    googlePlaceId?: string;
+    googleMapsUrl?: string;
 }
 
 export interface UpdateCompanyPayload {
@@ -28,4 +33,8 @@ export interface UpdateCompanyPayload {
     description?: string;
     avatarUrl?: string;
     placeAddress?: string;
+    placeLat?: string;
+    placeLng?: string;
+    googlePlaceId?: string;
+    googleMapsUrl?: string;
 }

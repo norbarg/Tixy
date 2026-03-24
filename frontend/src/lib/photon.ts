@@ -1,4 +1,3 @@
-//src/lib/photon.ts
 export type PhotonFeature = {
     geometry: {
         coordinates: [number, number];
@@ -6,6 +5,7 @@ export type PhotonFeature = {
     properties: {
         name?: string;
         country?: string;
+        countrycode?: string;
         state?: string;
         city?: string;
         county?: string;
@@ -27,6 +27,14 @@ export type PlaceSuggestion = {
     placeAddress: string;
     lat: string | null;
     lng: string | null;
+    country: string | null;
+    countryCode: string | null;
+    state: string | null;
+};
+
+type SearchPlacesOptions = {
+    limit?: number;
+    onlyUSA?: boolean;
 };
 
 function buildAddress(properties: PhotonFeature['properties']) {
@@ -40,14 +48,17 @@ function buildAddress(properties: PhotonFeature['properties']) {
     return parts.join(', ');
 }
 
-export async function searchPlaces(query: string): Promise<PlaceSuggestion[]> {
+export async function searchPlaces(
+    query: string,
+    options?: SearchPlacesOptions,
+): Promise<PlaceSuggestion[]> {
     const trimmed = query.trim();
 
     if (!trimmed) return [];
 
     const url = new URL('https://photon.komoot.io/api/');
     url.searchParams.set('q', trimmed);
-    url.searchParams.set('limit', '6');
+    url.searchParams.set('limit', String(options?.limit ?? 6));
 
     const response = await fetch(url.toString(), {
         headers: {
@@ -61,7 +72,7 @@ export async function searchPlaces(query: string): Promise<PlaceSuggestion[]> {
 
     const data = (await response.json()) as PhotonResponse;
 
-    return data.features
+    const mapped = data.features
         .map((feature) => {
             const properties = feature.properties;
             const [lng, lat] = feature.geometry.coordinates;
@@ -81,7 +92,21 @@ export async function searchPlaces(query: string): Promise<PlaceSuggestion[]> {
                 placeAddress: placeAddress || placeName,
                 lat: lat != null ? String(lat) : null,
                 lng: lng != null ? String(lng) : null,
-            };
+                country: properties.country || null,
+                countryCode: properties.countrycode || null,
+                state: properties.state || null,
+            } satisfies PlaceSuggestion;
         })
         .filter((item) => item.label);
+
+    if (options?.onlyUSA) {
+        return mapped.filter((item) => {
+            const code = item.countryCode?.toLowerCase();
+            const country = item.country?.toLowerCase();
+
+            return code === 'us' || country === 'united states';
+        });
+    }
+
+    return mapped;
 }

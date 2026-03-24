@@ -1,3 +1,4 @@
+//src/modules/subscriptions/subscriptions.service.ts
 import {
   ConflictException,
   Injectable,

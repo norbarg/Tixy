@@ -1,3 +1,4 @@
+// src/api/companies.api.ts
 import { api } from './axios';
 import type {
     Company,
@@ -10,6 +11,11 @@ export const companiesApi = {
         const { data } = await api.get<Company[]>('/companies', {
             params: search ? { search } : undefined,
         });
+        return data;
+    },
+
+    async getById(id: string) {
+        const { data } = await api.get<Company>(`/companies/${id}`);
         return data;
     },
 

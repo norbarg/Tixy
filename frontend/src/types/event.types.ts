@@ -1,3 +1,4 @@
+//src/types/event.types.ts
 export type EventCategory =
     | 'business'
     | 'politics'
@@ -36,6 +37,7 @@ export interface EventItem {
     startsAt: string;
     endsAt: string;
     publishedAt: string;
+    redirectAfterPurchaseUrl: string | null;
     price: string;
     ticketsLimit: number;
     visitorsVisibility: string;

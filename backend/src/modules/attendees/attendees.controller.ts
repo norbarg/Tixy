@@ -1,3 +1,4 @@
+//src/modules/attendees/attendees.controller.ts
 import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AttendeesService } from './attendees.service';

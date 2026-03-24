@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useMemo, useState } from 'react';
 import type { EventItem } from '../../types/event.types';
 import defaultPoster from '../../assets/home/default-poster.png';
@@ -41,55 +42,63 @@ export function EventCard({ event }: EventCardProps) {
         event.posterUrl && !imageError ? event.posterUrl : defaultPoster;
 
     return (
-        <article className="event-card">
-            <div className="event-card__image-wrap">
-                <img
-                    src={imageUrl}
-                    alt={event.title}
-                    className="event-card__image"
-                    onError={() => setImageError(true)}
-                />
-
-                <div className="event-card__place-badge">
-                    <span className="event-card__place-text">{shortPlace}</span>
+        <Link to={`/events/${event.id}`} className="event-card__link">
+            <article className="event-card">
+                <div className="event-card__image-wrap">
                     <img
-                        src={locationRedIcon}
-                        alt="Location"
-                        className="event-card__place-icon"
+                        src={imageUrl}
+                        alt={event.title}
+                        className="event-card__image"
+                        onError={() => setImageError(true)}
                     />
-                </div>
 
-                <div className="event-card__hover">
-                    <div className="event-card__hover-inner">
-                        <div className="event-card__date-box">
-                            <span className="event-card__month">
-                                {date.month}
-                            </span>
-                            <span className="event-card__day">{date.day}</span>
-                        </div>
+                    <div className="event-card__place-badge">
+                        <span className="event-card__place-text">
+                            {shortPlace}
+                        </span>
+                        <img
+                            src={locationRedIcon}
+                            alt="Location"
+                            className="event-card__place-icon"
+                        />
+                    </div>
 
-                        <div className="event-card__content">
-                            <h3 className="event-card__title">{event.title}</h3>
-
-                            <p className="event-card__description">
-                                {event.description}
-                            </p>
-
-                            <div className="event-card__footer">
-                                <span className="event-card__place">
-                                    {shortPlace}
+                    <div className="event-card__hover">
+                        <div className="event-card__hover-inner">
+                            <div className="event-card__date-box">
+                                <span className="event-card__month">
+                                    {date.month}
                                 </span>
+                                <span className="event-card__day">
+                                    {date.day}
+                                </span>
+                            </div>
 
-                                <img
-                                    src={locationRedIcon}
-                                    alt="Location"
-                                    className="event-card__footer-icon"
-                                />
+                            <div className="event-card__content">
+                                <h3 className="event-card__title">
+                                    {event.title}
+                                </h3>
+
+                                <p className="event-card__description">
+                                    {event.description}
+                                </p>
+
+                                <div className="event-card__footer">
+                                    <span className="event-card__place">
+                                        {shortPlace}
+                                    </span>
+
+                                    <img
+                                        src={locationRedIcon}
+                                        alt="Location"
+                                        className="event-card__footer-icon"
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </article>
+            </article>
+        </Link>
     );
 }

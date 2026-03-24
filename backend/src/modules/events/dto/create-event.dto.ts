@@ -7,6 +7,7 @@ import {
   IsNumberString,
   IsOptional,
   IsString,
+  IsUrl,
   MaxLength,
   Min,
 } from 'class-validator';
@@ -82,11 +83,21 @@ export class CreateEventDto {
   @ApiProperty({ example: '2026-04-10T18:00:00.000Z' })
   @IsDateString()
   endsAt: string;
-  //--------------------------------------------------------косательно публикации события, может быть указано при создании, если организатор хочет сразу опубликовать событие, иначе событие будет сохранено как черновик (неопубликованное) и его можно будет опубликовать позже, указав дату публикации--------------------------------------------------------
+
   @ApiPropertyOptional({ example: '2026-04-05T12:00:00.000Z' })
   @IsOptional()
   @IsDateString()
   publishedAt?: string;
+
+  @ApiPropertyOptional({
+    example: 'https://example.com/thank-you',
+  })
+  @IsOptional()
+  @IsUrl({
+    require_protocol: true,
+  })
+  @MaxLength(2048)
+  redirectAfterPurchaseUrl?: string;
 
   @ApiProperty({ example: '499.99' })
   @IsNumberString()

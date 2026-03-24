@@ -68,7 +68,7 @@ export class EventsService {
       startsAt: new Date(dto.startsAt),
       endsAt: new Date(dto.endsAt),
       publishedAt: dto.publishedAt ? new Date(dto.publishedAt) : now,
-      // publishedAt: now,
+      redirectAfterPurchaseUrl: dto.redirectAfterPurchaseUrl ?? null,
       price: dto.price,
       ticketsLimit: dto.ticketsLimit,
       visitorsVisibility: dto.visitorsVisibility ?? VisitorsVisibility.PUBLIC,
@@ -96,9 +96,14 @@ export class EventsService {
 
   async getAllPublic(query: GetEventsQueryDto) {
     const qb = this.eventsRepository.createQueryBuilder('event');
+    const now = new Date();
 
     qb.where('event.status = :status', {
       status: EventStatus.PUBLISHED,
+    });
+
+    qb.andWhere('event.publishedAt <= :now', {
+      now,
     });
 
     if (query.format) {
@@ -232,6 +237,7 @@ export class EventsService {
       startsAt: event.startsAt,
       endsAt: event.endsAt,
       publishedAt: event.publishedAt,
+      redirectAfterPurchaseUrl: event.redirectAfterPurchaseUrl,
       price: event.price,
       ticketsLimit: event.ticketsLimit,
       visitorsVisibility: event.visitorsVisibility,
@@ -260,6 +266,7 @@ export class EventsService {
       startsAt: event.startsAt,
       endsAt: event.endsAt,
       publishedAt: event.publishedAt,
+      redirectAfterPurchaseUrl: event.redirectAfterPurchaseUrl,
       price: event.price,
       ticketsLimit: event.ticketsLimit,
       visitorsVisibility: event.visitorsVisibility,

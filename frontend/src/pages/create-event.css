@@ -1,740 +1,787 @@
 /* create-event.css */
 .create-event-page {
-  min-height: calc(100vh - 208px);
-  padding: 120px 40px 60px;
-  box-sizing: border-box;
+    min-height: calc(100vh - 208px);
+    padding: 120px 40px 60px;
+    box-sizing: border-box;
 }
 
 .create-event-page__inner {
-  max-width: 1220px;
-  margin: 0 auto;
-  width: 100%;
+    max-width: 1220px;
+    margin: 0 auto;
+    width: 100%;
 }
 
 .create-event-form__header {
-  text-align: center;
-  margin-bottom: 58px;
+    text-align: center;
+    margin-bottom: 58px;
 }
 
 .create-event-form__title {
-  margin: 0;
-  font-size: 30px;
-  font-weight: 500;
-  color: #111;
+    margin: 0;
+    font-size: 30px;
+    font-weight: 500;
+    color: #111;
 }
 
 .create-event-form__grid {
-  display: grid;
-  grid-template-columns: 320px minmax(0, 1fr);
-  column-gap: 72px;
-  row-gap: 32px;
-  align-items: start;
+    display: grid;
+    grid-template-columns: 320px minmax(0, 1fr);
+    column-gap: 72px;
+    row-gap: 32px;
+    align-items: start;
 }
 
 .create-event-media {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
 }
 
 .create-event-media__poster-block {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
 
 .create-event-media__banner-label {
-  color: #7c94d4;
-  font-size: 20px;
-  font-weight: 400;
-  margin-top: 4px;
+    color: #7c94d4;
+    font-size: 20px;
+    font-weight: 400;
+    margin-top: 4px;
 }
 
- .event-upload {
-  position: relative;
-  overflow: hidden;
-  background: #f3f5f9;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
+.event-upload {
+    position: relative;
+    overflow: hidden;
+    background: #f3f5f9;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
 }
 
 .event-upload--poster {
-  width: 281px;
-  height: 355px;
-  border-radius: 12px;
+    width: 281px;
+    height: 355px;
+    border-radius: 12px;
 }
 
 .event-upload.is-dragging {
-  outline: 3px dashed #d2222f;
-  outline-offset: 6px;
+    outline: 3px dashed #d2222f;
+    outline-offset: 6px;
 }
 
 .event-upload__image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
 
 .event-upload__shade {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0);
-  transition: background-color 0.25s ease;
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0);
+    transition: background-color 0.25s ease;
 }
 
 .event-upload.has-image:hover .event-upload__shade {
-  background: rgba(0, 0, 0, 0.35);
+    background: rgba(0, 0, 0, 0.35);
 }
 
 .event-upload:hover .event-upload__shade {
-  background: rgba(0, 0, 0, 0.35);
+    background: rgba(0, 0, 0, 0.35);
 }
 
 .event-upload__icon,
 .event-upload__image {
-  width: 100%;
-  height: 100%;
-  display: block;
+    width: 100%;
+    height: 100%;
+    display: block;
 }
 
 .event-upload__image {
-  object-fit: cover;
+    object-fit: cover;
 }
 
 .event-upload__icon {
-  object-fit: cover;
+    object-fit: cover;
 }
 
 .event-upload__input {
-  display: none;
+    display: none;
 }
 
 .create-event-fields {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 300px;
-  gap: 28px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 28px;
 }
 
 .create-event-fields__left,
 .create-event-fields__right {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
 }
 .create-event-fields__right {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
 }
 
 .event-select__arrow {
-  width: 10px;
-  height: 10px;
-  object-fit: contain;
-  flex-shrink: 0;
-  margin-left: 12px;
-  display: block;
+    width: 10px;
+    height: 10px;
+    object-fit: contain;
+    flex-shrink: 0;
+    margin-left: 12px;
+    display: block;
 }
 
 .event-field {
-  position: relative;
-  display: flex;
-  flex-direction: column;
+    position: relative;
+    display: flex;
+    flex-direction: column;
 }
 
 .event-field__label {
-  color: #7c94d4;
-  font-size: 20px;
-  font-weight: 400;
-  margin-bottom: 8px;
+    color: #7c94d4;
+    font-size: 20px;
+    font-weight: 400;
+    margin-bottom: 8px;
 }
 
 .event-field__input,
 .event-field__textarea,
 .event-select__trigger {
-  border: none;
-  border-bottom: 2px solid #727E8A;
-  background: transparent;
-  color: #111;
-  font-size: 18px;
-  font-weight: 400;
-  padding: 10px 0 12px;
-  outline: none;
-  box-sizing: border-box;
+    border: none;
+    border-bottom: 2px solid #727e8a;
+    background: transparent;
+    color: #111;
+    font-size: 18px;
+    font-weight: 400;
+    padding: 10px 0 12px;
+    outline: none;
+    box-sizing: border-box;
 }
 
 .event-field__input::placeholder,
 .event-field__textarea::placeholder {
-  color: #727E8A;
-  font-weight: 400;
+    color: #727e8a;
+    font-weight: 400;
 }
 
 .event-field__input:focus,
 .event-field__textarea:focus {
-  border-bottom-color: #7c94d4;
+    border-bottom-color: #7c94d4;
 }
 
 .event-field__input--wide,
 .event-field__textarea--wide {
-  width: 100%;
-  max-width: 520px;
+    width: 100%;
+    max-width: 520px;
 }
 
 .event-field__input--short {
-  width: 140px;
+    width: 140px;
 }
 
 .event-field__input--date {
-  width: 158px;
+    width: 158px;
 }
 
 .event-field__input--publication {
-  width: 168px;
+    width: 168px;
 }
 
 .event-field__textarea {
-  width: 100%;
-  max-width: 500px;
-  height: 96px;
-  min-height: 82px;
-  max-height: 86px;
-  resize: none;
-  overflow-y: auto;
-  overflow-x: hidden;
-  line-height: 1.15;
-  padding-right: 8px;
+    width: 100%;
+    max-width: 500px;
+    height: 96px;
+    min-height: 82px;
+    max-height: 86px;
+    resize: none;
+    overflow-y: auto;
+    overflow-x: hidden;
+    line-height: 1.15;
+    padding-right: 8px;
 }
 
 .event-field__textarea::-webkit-scrollbar {
-  width: 5px;
+    width: 5px;
 }
 
 .event-field__textarea::-webkit-scrollbar-track {
-  background: transparent;
-  margin: 10px 0;
+    background: transparent;
+    margin: 10px 0;
 }
 
 .event-field__textarea::-webkit-scrollbar-thumb {
-  background: #b8c0cc;
-  border-radius: 999px;
+    background: #b8c0cc;
+    border-radius: 999px;
 }
 
 .event-select__trigger {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-  text-align: left;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    text-align: left;
 }
 
 .event-select__menu {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
-  width: 100%;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(17, 17, 17, 0.08);
-  z-index: 20;
-  overflow: hidden;
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    width: 100%;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(17, 17, 17, 0.08);
+    z-index: 20;
+    overflow: hidden;
 }
 
 .event-select__item {
-  width: 100%;
-  border: none;
-  background: #fff;
-  text-align: left;
-  padding: 12px 14px;
-  font-size: 16px;
-  color: #111;
-  cursor: pointer;
+    width: 100%;
+    border: none;
+    background: #fff;
+    text-align: left;
+    padding: 12px 14px;
+    font-size: 16px;
+    color: #111;
+    cursor: pointer;
 }
 
 .event-select__item:hover {
-  background: #f6f8fc;
+    background: #f6f8fc;
 }
 
 .promo-field__empty-row {
-  display: flex;
-  align-items: center;
-  height: 44px;
+    display: flex;
+    align-items: center;
+    height: 44px;
 }
 
 .promo-field__add-first {
-  border: none;
-  background: transparent;
-  color: #727e8a;
-  font-size: 18px;
-  padding: 0;
-  cursor: pointer;
+    border: none;
+    background: transparent;
+    color: #727e8a;
+    font-size: 18px;
+    padding: 0;
+    cursor: pointer;
 }
 
 .promo-field__row {
-  display: grid;
-  grid-template-columns: 1fr 80px 32px;
-  gap: 10px;
-  align-items: end;
-  margin-bottom: 8px;
+    display: grid;
+    grid-template-columns: 1fr 80px 32px;
+    gap: 10px;
+    align-items: end;
+    margin-bottom: 8px;
 }
 
 .promo-field__code {
-  width: 100%;
+    width: 100%;
 }
 
 .promo-field__discount {
-  width: 80px;
+    width: 80px;
 }
 
 .promo-field__action {
-  width: 32px;
-  height: 32px;
-  border: none;
-  background: transparent;
-  color: #727e8a;
-  font-size: 32px;
-  line-height: 1;
-  cursor: pointer;
-  padding: 0;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    color: #727e8a;
+    font-size: 32px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
 }
 
 .create-event-bottom {
-  grid-column: 1 / -1;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 28px;
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 28px;
 }
 
 .event-select--visibility {
-  min-width: 440px;
+    min-width: 440px;
 }
 
 .event-checkbox {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: #111;
-  font-size: 16px;
-  font-weight: 400;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #111;
+    font-size: 16px;
+    font-weight: 400;
 }
 
 .event-checkbox input {
-  width: 18px;
-  height: 18px;
-  accent-color: #d2222f;
-  cursor: pointer;
+    width: 18px;
+    height: 18px;
+    accent-color: #d2222f;
+    cursor: pointer;
 }
 
 .create-event-bottom__right {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 26px;
-  width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 26px;
+    width: 100%;
 }
 
 .create-event-bottom__left {
-  display: flex;
-  align-items: flex-start;
-  gap: 166px;
-  width: 100%;
+    display: grid;
+    grid-template-columns: 260px 260px minmax(320px, 1fr);
+    gap: 28px;
+    width: 100%;
+    align-items: start;
+}
+
+.event-field__input--redirect {
+    width: 260px;
 }
 .create-event-form__submit {
-  width: 100%;
-  max-width: 175px;
-  height: 48px;
-  border: none;
-  border-radius: 12px;
-  background: #d2222f;
-  color: #fff;
-  font-size: 18px;
-  font-weight: 500;
-  cursor: pointer;
-  padding: 0 18px 0 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+    width: 100%;
+    max-width: 175px;
+    height: 48px;
+    border: none;
+    border-radius: 12px;
+    background: #d2222f;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0 18px 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
 }
 
 .create-event-form__submit:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
+    opacity: 0.65;
+    cursor: not-allowed;
 }
 
 .create-event-form__submit-icon {
-  width: 13px;
-  height: 13px;
-  object-fit: contain;
-  flex-shrink: 0;
+    width: 13px;
+    height: 13px;
+    object-fit: contain;
+    flex-shrink: 0;
 }
 
 .create-event-form__error {
-  grid-column: 1 / -1;
-  margin: 0;
-  color: #d2222f;
-  font-size: 15px;
-  font-weight: 500;
+    grid-column: 1 / -1;
+    margin: 0;
+    color: #d2222f;
+    font-size: 15px;
+    font-weight: 500;
 }
 
 .create-event-fields__row--price {
-  display: flex;
-  align-items: flex-start;
-  gap: 220px;
-  flex-wrap: nowrap;
+    display: flex;
+    align-items: flex-start;
+    gap: 220px;
+    flex-wrap: nowrap;
 }
 
 .event-field__input-wrap {
-  position: relative;
-  width: 140px;
+    position: relative;
+    width: 140px;
 }
 
 .event-field__prefix {
-  position: absolute;
-  left: 0;
-  bottom: 12px;
-  color: #111;
-  font-size: 18px;
-  font-weight: 400;
-  pointer-events: none;
+    position: absolute;
+    left: 0;
+    bottom: 12px;
+    color: #111;
+    font-size: 18px;
+    font-weight: 400;
+    pointer-events: none;
 }
 
 .event-field__input--with-prefix {
-  padding-left: 18px;
+    padding-left: 18px;
 }
 
 .promo-field__discount-wrap {
-  position: relative;
-  width: 80px;
+    position: relative;
+    width: 80px;
 }
 
 .promo-field__prefix {
-  position: absolute;
-  left: 0;
-  bottom: 12px;
-  color: #111;
-  font-size: 18px;
-  font-weight: 400;
-  pointer-events: none;
+    position: absolute;
+    left: 0;
+    bottom: 12px;
+    color: #111;
+    font-size: 18px;
+    font-weight: 400;
+    pointer-events: none;
 }
 
 .promo-field__discount--with-prefix {
-  padding-left: 18px;
+    padding-left: 18px;
 }
 
 .create-event-banner-block {
-  grid-column: 1 / -1;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  width: 100%;
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
 }
 
 .event-upload--banner {
-  width: 721px;
-  height: 234px;
-  min-height: 234px;
-  max-height: 234px;
-  border-radius: 12px;
+    width: 721px;
+    height: 234px;
+    min-height: 234px;
+    max-height: 234px;
+    border-radius: 12px;
 }
 
 .create-event-media__banner-row {
-  display: grid;
-  grid-template-columns: 661px 300px;
-  gap: 32px;
-  align-items: start;
+    display: grid;
+    grid-template-columns: 661px 300px;
+    gap: 32px;
+    align-items: start;
 }
 
 .create-event-media__banner-main {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
 
 .promo-field--side {
-  width: 100%;
-  margin-top: 39px;
-  margin-left: 57px;
+    width: 100%;
+    margin-top: 39px;
+    margin-left: 57px;
 }
 
 .promo-field--side .promo-field__row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 80px 32px;
-  gap: 10px;
-  align-items: end;
-  margin-bottom: 8px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 80px 32px;
+    gap: 10px;
+    align-items: end;
+    margin-bottom: 8px;
 }
 
 .promo-field--side .promo-field__code {
-  width: 100%;
-  min-width: 0;
+    width: 100%;
+    min-width: 0;
 }
 
 /* datepicker */
 
 .create-event-fields__row--dates {
-  display: flex;
-  align-items: flex-start;
-  gap: 15px;
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
 }
 
 .event-field__date-picker {
-  width: 149px;
-  min-width: 149px;
+    width: 149px;
+    min-width: 149px;
 }
 
 .event-field__publication-picker {
-  width: 260px;
-  min-width: 260px;
+    width: 260px;
+    min-width: 260px;
 }
 
 .react-datepicker-wrapper {
-  display: block;
-  width: 100%;
+    display: block;
+    width: 100%;
 }
 
 .react-datepicker__input-container {
-  display: block;
-  width: 100%;
+    display: block;
+    width: 100%;
 }
 
 .event-field__input--datepicker {
-  display: block;
-  text-align: left;
-  cursor: pointer;
-  padding: 10px 0 12px;
-  border: none;
-  border-bottom: 2px solid #727E8A;
-  background: transparent;
-  color: #111;
-  font-size: 18px;
-  font-weight: 400;
-  outline: none;
-  box-sizing: border-box;
+    display: block;
+    text-align: left;
+    cursor: pointer;
+    padding: 10px 0 12px;
+    border: none;
+    border-bottom: 2px solid #727e8a;
+    background: transparent;
+    color: #111;
+    font-size: 18px;
+    font-weight: 400;
+    outline: none;
+    box-sizing: border-box;
 }
 
 .event-field__input--datepicker:hover {
-  border-bottom-color: #7c94d4;
+    border-bottom-color: #7c94d4;
 }
 
 .event-field__input--datepicker:focus,
 .event-field__input--datepicker:focus-visible {
-  border-bottom-color: #7c94d4;
+    border-bottom-color: #7c94d4;
 }
 
 .event-field__datepicker-placeholder {
-  color: #727e8a;
-  font-weight: 400;
+    color: #727e8a;
+    font-weight: 400;
 }
 
 .react-datepicker-popper {
-  z-index: 100;
-  padding-top: 10px;
+    z-index: 100;
+    padding-top: 10px;
 }
 
 .react-datepicker__triangle {
-  display: none;
+    display: none;
 }
 
 .react-datepicker__current-month,
 .react-datepicker-time__header,
 .react-datepicker-year-header {
-  color: #111;
-  font-weight: 600;
-  font-size: 18px;
+    color: #111;
+    font-weight: 600;
+    font-size: 18px;
 }
 
 .react-datepicker__day-names {
-  display: flex;
-  justify-content: space-between;
-  padding: 0 14px;
-  margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 14px;
+    margin-top: 10px;
 }
 
 .react-datepicker__week {
-  display: flex;
-  justify-content: space-between;
-  padding: 0 14px;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 14px;
 }
 
 .react-datepicker__day-name,
 .react-datepicker__day {
-  width: 38px;
-  line-height: 38px;
-  margin: 4px 0;
-  text-align: center;
+    width: 38px;
+    line-height: 38px;
+    margin: 4px 0;
+    text-align: center;
 }
 
 .react-datepicker__day {
-  border-radius: 10px;
+    border-radius: 10px;
 }
 
 .react-datepicker__day--today {
-  font-weight: 700;
+    font-weight: 700;
 }
 
 .react-datepicker__day--selected,
 .react-datepicker__day--keyboard-selected {
-  background-color: #d2222f !important;
-  color: #fff !important;
+    background-color: #d2222f !important;
+    color: #fff !important;
 }
 
 .react-datepicker__day:hover {
-  background-color: #f2f5fb !important;
-  color: #111 !important;
+    background-color: #f2f5fb !important;
+    color: #111 !important;
 }
 
 .react-datepicker__day--outside-month {
-  color: #b7bfcb;
+    color: #b7bfcb;
 }
 
 .react-datepicker__time-container {
-  width: 132px;
-  border-left: 1px solid #e8edf5;
-  background: #fff;
+    width: 132px;
+    border-left: 1px solid #e8edf5;
+    background: #fff;
 }
 
 .react-datepicker__header--time {
-  background: #f6f8fc;
-  border-bottom: 1px solid #e5ebf3;
+    background: #f6f8fc;
+    border-bottom: 1px solid #e5ebf3;
 }
 
 .react-datepicker__time {
-  background: #fff;
+    background: #fff;
 }
 
 .react-datepicker__time-box {
-  width: 100% !important;
+    width: 100% !important;
 }
 
 .react-datepicker__time-list {
-  height: 290px !important;
-  padding: 8px 0 !important;
+    height: 290px !important;
+    padding: 8px 0 !important;
 }
 
 .react-datepicker__time-list-item {
-  height: 38px !important;
-  line-height: 38px !important;
-  margin: 0 8px;
-  border-radius: 10px;
+    height: 38px !important;
+    line-height: 38px !important;
+    margin: 0 8px;
+    border-radius: 10px;
 }
 
 .react-datepicker__time-list-item:hover {
-  background-color: #f2f5fb !important;
-  color: #111 !important;
+    background-color: #f2f5fb !important;
+    color: #111 !important;
 }
 
 .react-datepicker__time-list-item--selected {
-  background-color: #d2222f !important;
-  color: #fff !important;
+    background-color: #d2222f !important;
+    color: #fff !important;
 }
 
 .react-datepicker {
-  position: relative;
-  display: flex;
-  border: 1px solid #e8edf5;
-  border-radius: 18px;
-  overflow: hidden;
-  box-shadow: 0 16px 40px rgba(17, 17, 17, 0.14);
-  font-family: inherit;
-  background: #fff;
+    position: relative;
+    display: flex;
+    border: 1px solid #e8edf5;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 16px 40px rgba(17, 17, 17, 0.14);
+    font-family: inherit;
+    background: #fff;
 }
 
 .react-datepicker__month-container {
-  float: none;
-  width: 320px;
-  background: #fff;
+    float: none;
+    width: 320px;
+    background: #fff;
 }
 
 .react-datepicker__header {
-  position: relative;
-  background: #f6f8fc;
-  border-bottom: 1px solid #e5ebf3;
-  padding: 14px 44px 12px;
+    position: relative;
+    background: #f6f8fc;
+    border-bottom: 1px solid #e5ebf3;
+    padding: 14px 44px 12px;
 }
 
 .react-datepicker__current-month,
 .react-datepicker-time__header,
 .react-datepicker-year-header {
-  color: #111;
-  font-weight: 600;
-  font-size: 18px;
+    color: #111;
+    font-weight: 600;
+    font-size: 18px;
 }
 
 .react-datepicker__navigation {
-  top: 16px;
-  width: 28px;
-  height: 28px;
-  min-width: 28px;
-  padding: 0;
-  border: none;
-  background: transparent;
+    top: 16px;
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    padding: 0;
+    border: none;
+    background: transparent;
 }
 
 .react-datepicker__navigation--previous {
-  left: 14px !important;
-  right: auto !important;
+    left: 14px !important;
+    right: auto !important;
 }
 
 .react-datepicker__navigation--next {
-  left: 278px !important;
-  right: auto !important;
+    left: 278px !important;
+    right: auto !important;
 }
 
 .react-datepicker__navigation-icon {
-  position: relative;
-  font-size: 0;
+    position: relative;
+    font-size: 0;
 }
 
 .react-datepicker__navigation-icon::before {
-  border-color: #bfc5cf;
-  border-style: solid;
-  border-width: 2px 2px 0 0;
-  content: '';
-  display: block;
-  height: 5px;
-  width: 5px;
-  position: absolute;
-  top: -10px;
+    border-color: #bfc5cf;
+    border-style: solid;
+    border-width: 2px 2px 0 0;
+    content: '';
+    display: block;
+    height: 5px;
+    width: 5px;
+    position: absolute;
+    top: -10px;
 }
 
-.react-datepicker__navigation--previous .react-datepicker__navigation-icon::before {
-  right: -2px;
-  transform: rotate(-135deg);
+.react-datepicker__navigation--previous
+    .react-datepicker__navigation-icon::before {
+    right: -2px;
+    transform: rotate(-135deg);
 }
 
 .react-datepicker__navigation--next .react-datepicker__navigation-icon::before {
-  left: -2px;
-  transform: rotate(45deg);
+    left: -2px;
+    transform: rotate(45deg);
 }
 
 .react-datepicker__navigation:hover .react-datepicker__navigation-icon::before {
-  border-color: #7c94d4;
+    border-color: #7c94d4;
 }
 
 .react-datepicker__time-container {
-  width: 132px;
-  border-left: 1px solid #e8edf5;
-  background: #fff;
-  flex-shrink: 0;
+    width: 132px;
+    border-left: 1px solid #e8edf5;
+    background: #fff;
+    flex-shrink: 0;
 }
 
 .react-datepicker__header--time {
-  background: #f6f8fc;
-  border-bottom: 1px solid #e5ebf3;
-  padding: 14px 0 12px;
+    background: #f6f8fc;
+    border-bottom: 1px solid #e5ebf3;
+    padding: 14px 0 12px;
 }
-
 
 .react-datepicker__time-list-item {
-  height: 38px !important;
-  line-height: 38px !important;
-  padding: 0 10px !important;
-  white-space: nowrap;
+    height: 38px !important;
+    line-height: 38px !important;
+    padding: 0 10px !important;
+    white-space: nowrap;
 }
 
+.event-field {
+    position: relative;
+}
+
+.event-field__suggestions {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: #111;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.18);
+    z-index: 30;
+}
+
+.event-field__suggestion {
+    width: 100%;
+    border: none;
+    background: transparent;
+    color: #fff;
+    text-align: left;
+    padding: 12px 16px;
+    font-size: 14px;
+    line-height: 1.35;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.event-field__suggestion:last-child {
+    border-bottom: none;
+}
+
+.event-field__suggestion:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.event-field__suggestion--muted {
+    color: rgba(255, 255, 255, 0.65);
+    cursor: default;
+}

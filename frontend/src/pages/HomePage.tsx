@@ -81,9 +81,7 @@ export function HomePage() {
     );
     const [isPlaceOpen, setIsPlaceOpen] = useState(false);
     const [isPlaceLoading, setIsPlaceLoading] = useState(false);
-    const [selectedPlace, setSelectedPlace] = useState<PlaceSuggestion | null>(
-        null,
-    );
+    const [, setSelectedPlace] = useState<PlaceSuggestion | null>(null);
 
     const placeRef = useRef<HTMLDivElement | null>(null);
 
@@ -109,7 +107,10 @@ export function HomePage() {
         const timeoutId = window.setTimeout(async () => {
             try {
                 setIsPlaceLoading(true);
-                const suggestions = await searchPlaces(trimmed);
+                const suggestions = await searchPlaces(trimmed, {
+                    limit: 6,
+                    onlyUSA: true,
+                });
                 setPlaceSuggestions(suggestions);
                 setIsPlaceOpen(true);
             } catch (error) {

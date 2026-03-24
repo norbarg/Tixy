@@ -7,6 +7,7 @@ import { GoogleAuthSuccessPage } from './pages/GoogleAuthSuccessPage';
 import { AccountPage } from './pages/AccountPage';
 import { CreateCompanyPage } from './pages/CreateCompanyPage';
 import { CreateEventPage } from './pages/CreateEventPage';
+import { EventDetailsPage } from './pages/EventDetailsPage';
 
 function App() {
     return (
@@ -19,6 +20,7 @@ function App() {
                     element={<GoogleAuthSuccessPage />}
                 />
                 <Route path="/account" element={<AccountPage />} />
+                <Route path="/events/:id" element={<EventDetailsPage />} />
                 <Route path="/create-company" element={<CreateCompanyPage />} />
                 <Route path="/create-event" element={<CreateEventPage />} />
             </Routes>

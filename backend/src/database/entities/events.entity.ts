@@ -89,6 +89,14 @@ export class Event {
   @Column({ name: 'published_at', type: 'timestamp' })
   publishedAt: Date;
 
+  @Column({
+    name: 'redirect_after_purchase_url',
+    type: 'varchar',
+    length: 2048,
+    nullable: true,
+  })
+  redirectAfterPurchaseUrl: string | null;
+
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   price: string;
 

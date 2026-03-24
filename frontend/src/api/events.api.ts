@@ -1,3 +1,4 @@
+// src/api/events.api.ts
 import { api } from './axios';
 import type {
     EventItem,
@@ -29,6 +30,7 @@ export type CreateEventPayload = {
     startsAt: string;
     endsAt: string;
     publishedAt?: string;
+    redirectAfterPurchaseUrl?: string;
     price: string;
     ticketsLimit: number;
     visitorsVisibility?: string;
