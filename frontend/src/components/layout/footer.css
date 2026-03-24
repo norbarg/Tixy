@@ -65,6 +65,8 @@
 }
 
 .footer__link {
+    display: inline-block;
+    text-decoration: none;
     width: fit-content;
     padding: 0;
     border: none;

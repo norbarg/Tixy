@@ -1,4 +1,5 @@
 // src/api/events.api.ts
+
 import { api } from './axios';
 import type {
     EventItem,
@@ -37,9 +38,35 @@ export type CreateEventPayload = {
     notifyOnNewVisitor?: boolean;
 };
 
+// export const eventsApi = {
+//     async getAll(params?: GetEventsParams) {
+//         const { data } = await api.get<EventItem[]>('/events', { params });
+//         return data;
+//     },
+
+//     async getById(id: string) {
+//         const { data } = await api.get<EventItem>(`/events/${id}`);
+//         return data;
+//     },
+
+//     async createEvent(payload: CreateEventPayload) {
+//         const { data } = await api.post<EventItem>('/events', payload);
+//         return data;
+//     },
+
+//     async deleteEvent(id: string) {
+//         const { data } = await api.delete<{ message: string }>(`/events/${id}`);
+//         return data;
+//     },
+// };
 export const eventsApi = {
     async getAll(params?: GetEventsParams) {
         const { data } = await api.get<EventItem[]>('/events', { params });
+        return data;
+    },
+
+    async getMyEvents() {
+        const { data } = await api.get<EventItem[]>('/events/my');
         return data;
     },
 

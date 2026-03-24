@@ -1,4 +1,5 @@
 //src/types/event.types.ts
+
 export type EventCategory =
     | 'business'
     | 'politics'

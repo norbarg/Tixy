@@ -35,6 +35,11 @@ export class EventsController {
     return this.eventsService.create(user.sub, dto);
   }
 
+  @Get('my') // my created events
+getMyEvents(@CurrentUser() user: { sub: string }) {
+  return this.eventsService.getMyEvents(user.sub);
+}
+
   @Get('my-attending')
   getMyAttendingEvents(@CurrentUser() user: { sub: string }) {
     return this.attendeesService.getMyAttendingEvents(user.sub);
