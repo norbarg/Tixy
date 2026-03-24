@@ -1,7 +1,9 @@
 // Header.tsx
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
+import { api } from '../../api/axios';
 import logo from '../../assets/auth/logo.png';
 import flagUs from '../../assets/auth/flag-us.png';
 import bellIcon from '../../assets/auth/bell.png';
@@ -10,7 +12,10 @@ import './header.css';
 
 export function Header() {
     const { openAuthModal, isAuthenticated } = useAuth();
+
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [hasCompany, setHasCompany] = useState(false);
+    const [isCheckingCompany, setIsCheckingCompany] = useState(false);
 
     const hasNewNotifications = true;
     const hasNewCartItems = false;
@@ -34,6 +39,33 @@ export function Header() {
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
+
+    useEffect(() => {
+        const fetchMyCompany = async () => {
+            if (!isAuthenticated) {
+                setHasCompany(false);
+                setIsCheckingCompany(false);
+                return;
+            }
+
+            try {
+                setIsCheckingCompany(true);
+                await api.get('/companies/my');
+                setHasCompany(true);
+            } catch (error) {
+                if (axios.isAxiosError(error) && error.response?.status === 404) {
+                    setHasCompany(false);
+                } else {
+                    console.error('Failed to fetch my company:', error);
+                    setHasCompany(false);
+                }
+            } finally {
+                setIsCheckingCompany(false);
+            }
+        };
+
+        fetchMyCompany();
+    }, [isAuthenticated]);
 
     return (
         <header className="header">
@@ -98,13 +130,15 @@ export function Header() {
                                 Create News
                             </button>
 
-                            <Link
-                                to="/create-event"
-                                className="header__nav-link"
-                                onClick={closeMenu}
-                            >
-                                Create Event
-                            </Link>
+                            {!isCheckingCompany && (
+                                <Link
+                                    to={hasCompany ? '/create-event' : '/create-company'}
+                                    className="header__nav-link"
+                                    onClick={closeMenu}
+                                >
+                                    {hasCompany ? 'Create Event' : 'Create Company'}
+                                </Link>
+                            )}
 
                             <Link
                                 to="/account"

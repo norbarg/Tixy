@@ -1,12 +1,18 @@
+// Footer.tsx
 import footerLogo from '../../assets/logo-white.png';
 import footerBarcode from '../../assets/barcode.png';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import './footer.css';
 
 export function Footer() {
+    const { isAuthenticated } = useAuth();
+
     return (
         <footer className="footer">
             <div className="footer__inner">
                 <img src={footerLogo} alt="Tixy" className="footer__logo" />
+
                 <div className="footer__top">
                     <div className="footer__left">
                         <div className="footer__description">
@@ -27,21 +33,58 @@ export function Footer() {
                         <div className="footer__column">
                             <h3 className="footer__column-title">Account</h3>
 
-                            <button type="button" className="footer__link">
-                                Set Up Account
-                            </button>
-                            <button type="button" className="footer__link">
-                                My tickets
-                            </button>
-                            <button type="button" className="footer__link">
-                                Notifications
-                            </button>
-                            <button type="button" className="footer__link">
-                                Create Event
-                            </button>
-                            <button type="button" className="footer__link">
-                                My Events
-                            </button>
+                            {!isAuthenticated ? (
+                                <>
+                                    <span className="footer__link">
+                                        Set Up Account
+                                    </span>
+                                    <span className="footer__link">
+                                        My tickets
+                                    </span>
+                                    <span className="footer__link">
+                                        Notifications
+                                    </span>
+                                    <span className="footer__link">
+                                        Create Event
+                                    </span>
+                                    <span className="footer__link">
+                                        My Events
+                                    </span>
+                                </>
+                            ) : (
+                                <>
+                                    <Link
+                                        to="/account"
+                                        className="footer__link"
+                                    >
+                                        Set Up Account
+                                    </Link>
+                                    <Link
+                                        to="/account"
+                                        className="footer__link"
+                                    >
+                                        My tickets
+                                    </Link>
+                                    <Link
+                                        to=""
+                                        className="footer__link"
+                                    >
+                                        Notifications
+                                    </Link>
+                                    <Link
+                                        to="/create-event"
+                                        className="footer__link"
+                                    >
+                                        Create Event
+                                    </Link>
+                                    <Link
+                                        to="/account"
+                                        className="footer__link"
+                                    >
+                                        My Events
+                                    </Link>
+                                </>
+                            )}
                         </div>
 
                         <div className="footer__column">

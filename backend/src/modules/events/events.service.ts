@@ -213,6 +213,21 @@ export class EventsService {
     }
   }
 
+  async getMyEvents(ownerUserId: string) { // events created by me
+  const company = await this.findCompanyByOwnerUserId(ownerUserId);
+
+  if (!company) {
+    return [];
+  }
+
+  const events = await this.eventsRepository.find({
+    where: { companyId: company.id },
+    order: { createdAt: 'DESC' },
+  });
+
+  return events.map((event) => this.sanitizePrivateEvent(event));
+}
+
   private sanitizePublicEvent(event: Event) {
     return {
       id: event.id,

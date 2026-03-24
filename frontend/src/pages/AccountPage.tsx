@@ -13,6 +13,7 @@ import type { OrderItem } from '../types/order.types';
 import type { User } from '../types/auth.types';
 import type { EventItem } from '../types/event.types';
 import type { CommentItem } from '../types/comment.types';
+import { EventCard } from '../components/home/EventCard';
 
 import ordersDefaultIcon from '../assets/account/orders-default.png';
 import ordersHoverIcon from '../assets/account/orders-hover.png';
@@ -35,6 +36,7 @@ import logoutHoverIcon from '../assets/account/logout-hover.png';
 import logoutActiveIcon from '../assets/account/logout-active.png';
 import homeArrowIcon from '../assets/account/arrow2.png';
 import companyDefaultAvatar from '../assets/account/company-default-avatar.png';
+import deleteEventIcon from '../assets/account/delete-event-icon.png';
 
 import './account.css';
 
@@ -60,6 +62,10 @@ export function AccountPage() {
     const [orders, setOrders] = useState<OrderItem[]>([]);
     const [ordersLoading, setOrdersLoading] = useState(true);
     const [ordersError, setOrdersError] = useState('');
+
+    const [myEvents, setMyEvents] = useState<EventItem[]>([]);
+    const [myEventsLoading, setMyEventsLoading] = useState(true);
+    const [myEventsError, setMyEventsError] = useState('');
 
     const [company, setCompany] = useState<Company | null>(null);
     const [companyLoading, setCompanyLoading] = useState(true);
@@ -91,10 +97,21 @@ export function AccountPage() {
     }, [user]);
 
     useEffect(() => {
-        loadMyCompany();
-        loadMyOrders();
-    }, []);
+    loadMyCompany();
+    loadMyOrders();
+    loadMyEvents();
+}, []);
+//
+useEffect(() => {
+    if (!myEventsError) return;
 
+    const timer = setTimeout(() => {
+        setMyEventsError('');
+    }, 3000);
+
+    return () => clearTimeout(timer);
+}, [myEventsError]);
+//
     useEffect(() => {
         if (!settingsError) return;
 
@@ -183,6 +200,8 @@ export function AccountPage() {
         adminCompaniesLoading,
         adminEventsLoading,
         adminCommentsLoading,
+        myEvents, 
+        myEventsLoading, 
     ]);
 
     const hasAdminAccess = useMemo(() => user?.role === 'ADMIN', [user]);
@@ -322,17 +341,14 @@ export function AccountPage() {
     }
 
     async function handleDeleteAccount() {
-        const confirmed = window.confirm('Delete account?');
-        if (!confirmed) return;
-
-        try {
-            await usersApi.deleteMyAccount();
-            await logout();
-            navigate('/', { replace: true });
-        } catch {
-            setSettingsError('Failed to delete account');
-        }
+    try {
+        await usersApi.deleteMyAccount();
+        await logout();
+        navigate('/', { replace: true });
+    } catch {
+        setSettingsError('Failed to delete account');
     }
+}
 
     async function handleSaveCompany() {
         if (!company) return;
@@ -364,9 +380,6 @@ export function AccountPage() {
     async function handleDeleteCompany() {
         if (!company) return;
 
-        const confirmed = window.confirm('Delete company?');
-        if (!confirmed) return;
-
         try {
             await companiesApi.deleteCompany(company.id);
             setCompany(null);
@@ -383,9 +396,6 @@ export function AccountPage() {
     }
 
     async function handleAdminDeleteUser(id: string) {
-        const confirmed = window.confirm('Delete user?');
-        if (!confirmed) return;
-
         try {
             await usersApi.deleteUserById(id);
             setAdminUsers((prev) => prev.filter((item) => item.id !== id));
@@ -395,9 +405,6 @@ export function AccountPage() {
     }
 
     async function handleAdminDeleteCompany(id: string) {
-        const confirmed = window.confirm('Delete company?');
-        if (!confirmed) return;
-
         try {
             await companiesApi.deleteCompany(id);
             setAdminCompanies((prev) => prev.filter((item) => item.id !== id));
@@ -407,9 +414,6 @@ export function AccountPage() {
     }
 
     async function handleAdminDeleteEvent(id: string) {
-        const confirmed = window.confirm('Delete event?');
-        if (!confirmed) return;
-
         try {
             await eventsApi.deleteEvent(id);
             setAdminEvents((prev) => prev.filter((item) => item.id !== id));
@@ -419,9 +423,6 @@ export function AccountPage() {
     }
 
     async function handleAdminDeleteComment(id: string) {
-        const confirmed = window.confirm('Delete comment?');
-        if (!confirmed) return;
-
         try {
             await commentsApi.deleteComment(id);
             setAdminComments((prev) => prev.filter((item) => item.id !== id));
@@ -429,6 +430,28 @@ export function AccountPage() {
             setAdminError('Failed to delete comment');
         }
     }
+
+    async function loadMyEvents() {
+    try {
+        setMyEventsLoading(true);
+        setMyEventsError('');
+        const data = await eventsApi.getMyEvents();
+        setMyEvents(data);
+    } catch {
+        setMyEventsError('Failed to load events');
+    } finally {
+        setMyEventsLoading(false);
+    }
+}
+
+async function handleDeleteMyEvent(id: string) {
+    try {
+        await eventsApi.deleteEvent(id);
+        setMyEvents((prev) => prev.filter((item) => item.id !== id));
+    } catch {
+        setMyEventsError('Failed to delete event');
+    }
+}
 
     function formatSingleDate(value: string | null | undefined) {
         if (!value) return '-';
@@ -608,50 +631,77 @@ export function AccountPage() {
                             )}
                         </div>
                     )}
-
                     {activeSection === 'events' && (
-                        <div className="account-block account-scroll-item">
-                            {!companyLoading && !company ? (
-                                <div className="account-empty account-scroll-item">
-                                    <p className="account-muted">
-                                        OH! You have no events yet. First,
-                                        create your company to be able to add an
-                                        event.
-                                    </p>
-                                    <Link
-                                        to="/create-company"
-                                        state={{ section: 'settings' }}
-                                        className="account-home-link"
-                                    >
-                                        <span>Go to Company Settings</span>
-                                        <img
-                                            src={homeArrowIcon}
-                                            alt=""
-                                            className="account-home-link__icon"
-                                        />
-                                    </Link>
-                                </div>
-                            ) : (
-                                <div className="account-empty account-scroll-item">
-                                    <p className="account-muted">
-                                        OH! You have no events yet. Create your
-                                        first event to get started.
-                                    </p>
-                                    <Link
-                                        to="/create-event"
-                                        className="account-home-link"
-                                    >
-                                        <span>Go to Create Event Page</span>
-                                        <img
-                                            src={homeArrowIcon}
-                                            alt=""
-                                            className="account-home-link__icon"
-                                        />
-                                    </Link>
-                                </div>
-                            )}
-                        </div>
-                    )}
+    <div className="account-block account-scroll-item">
+        {myEventsLoading ? (
+            <p className="account-muted">Loading...</p>
+        ) : myEventsError ? (
+            <p className="account-error">{myEventsError}</p>
+        ) : myEvents.length > 0 ? (
+            <div className="account-events-grid">
+                {myEvents.map((event) => (
+                    <div
+    key={event.id}
+    className="account-events-grid__item account-scroll-item"
+>
+    <div className="account-event-card-wrap">
+        <EventCard event={event} />
+
+        <button
+            type="button"
+            className="account-event-card__delete-overlay"
+            onClick={() => handleDeleteMyEvent(event.id)}
+            aria-label={`Delete ${event.title}`}
+            title="Delete event"
+        >
+            <span className="account-event-card__delete-backdrop" />
+            <img
+                src={deleteEventIcon}
+                alt=""
+                className="account-event-card__delete-icon"
+            />
+        </button>
+    </div>
+</div>
+                ))}
+            </div>
+        ) : !companyLoading && !company ? (
+            <div className="account-empty account-scroll-item">
+                <p className="account-muted">
+                    OH! You have no events yet. First, create your company to be
+                    able to add an event.
+                </p>
+                <Link
+                    to="/create-company"
+                    state={{ section: 'settings' }}
+                    className="account-home-link"
+                >
+                    <span>Go to Company Settings</span>
+                    <img
+                        src={homeArrowIcon}
+                        alt=""
+                        className="account-home-link__icon"
+                    />
+                </Link>
+            </div>
+        ) : (
+            <div className="account-empty account-scroll-item">
+                <p className="account-muted">
+                    OH! You have no events yet. Create your first event to get
+                    started.
+                </p>
+                <Link to="/create-event" className="account-home-link">
+                    <span>Go to Create Event Page</span>
+                    <img
+                        src={homeArrowIcon}
+                        alt=""
+                        className="account-home-link__icon"
+                    />
+                </Link>
+            </div>
+        )}
+    </div>
+)}
 
                     {activeSection === 'admin' && (
                         <div className="account-block account-scroll-item">

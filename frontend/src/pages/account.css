@@ -89,6 +89,20 @@
   cursor: pointer;
 }
 
+.company-card__actions .account-action-btn,
+.company-card__actions .account-danger-btn {
+  height: 52px;
+  padding: 0 28px;
+  white-space: nowrap;
+  border: none;
+  border-radius: 12px;
+  height: 38px;
+  padding: 0 16px;
+  font-size: 18px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
 .account-action-btn {
   background: #E9EEFF;
   color: #727E8A;
@@ -316,20 +330,6 @@
   align-self: end;
 }
 
-.company-card__actions .account-action-btn,
-.company-card__actions .account-danger-btn {
-  height: 52px;
-  padding: 0 28px;
-  white-space: nowrap;
-  border: none;
-  border-radius: 12px;
-  height: 38px;
-  padding: 0 16px;
-  font-size: 18px;
-  font-weight: 500;
-  cursor: pointer;
-}
-
 /* ADMIN */
 .admin-section {
   margin-top: 28px;
@@ -375,3 +375,425 @@
   color: #111;
   font-weight: 400;
 }
+
+/* ADAPTIVE */
+@media (max-width: 1400px) {
+  .account-page__inner {
+    padding: 0 60px;
+    gap: 40px;
+  }
+
+  .company-card__fields {
+    grid-template-columns: minmax(220px, 1.3fr) minmax(220px, 1fr);
+  }
+
+  .company-card__email {
+    grid-column: 2;
+    grid-row: 1;
+    margin-left: 0;
+  }
+
+  .company-card__address {
+    grid-column: 1 / 3;
+    grid-row: 2;
+    margin-left: 0;
+  }
+
+  .company-card__description {
+    grid-column: 1 / 3;
+    grid-row: 3;
+  }
+}
+
+@media (max-width: 1100px) {
+  .account-page {
+    height: auto;
+    min-height: calc(100vh - 208px);
+    overflow: visible;
+  }
+
+  .account-page__title {
+    margin: 120px 0 40px;
+    font-size: 28px;
+  }
+
+  .account-page__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 0 24px 36px;
+  }
+.account-sidebar {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 10px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.account-sidebar__item {
+  flex: 0 0 auto;
+  min-width: 150px;
+  white-space: nowrap;
+}
+.account-sidebar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.account-sidebar::-webkit-scrollbar {
+  display: none;
+}
+
+  .account-sidebar__item--active {
+    background: #eef2ff;
+  }
+
+  .account-sidebar__text {
+    font-size: 16px;
+  }
+
+  .account-sidebar__icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .account-content {
+    width: 100%;
+    overflow: visible;
+    padding: 0;
+  }
+
+  .account-block {
+    margin-bottom: 40px;
+  }
+
+  .account-block__heading {
+    font-size: 22px;
+  }
+
+  .account-row {
+    grid-template-columns: 1fr 1fr auto auto;
+    gap: 14px 24px;
+    align-items: center;
+  }
+
+  .account-row .account-action-btn,
+  .account-row .account-danger-btn {
+    width: auto;
+    min-width: 0;
+    justify-self: start;
+    align-self: center;
+  }
+
+  .account-input,
+  .account-textarea {
+    font-size: 17px;
+  }
+
+  .account-action-btn,
+  .account-danger-btn {
+    width: auto;
+    min-width: 0;
+    height: 38px;
+    font-size: 17px;
+    padding: 0 16px;
+  }
+
+  .orders-list {
+    overflow-x: auto;
+    padding-bottom: 6px;
+    scrollbar-width: none;
+  }
+
+  .orders-list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .orders-head,
+  .orders-item {
+    min-width: 760px;
+  }
+
+  .company-card {
+    grid-template-columns: 56px 1fr;
+    column-gap: 18px;
+    row-gap: 18px;
+  }
+
+  .company-card__fields {
+    grid-template-columns: 1fr;
+    row-gap: 14px;
+  }
+
+  .company-card__name,
+  .company-card__email,
+  .company-card__address,
+  .company-card__description {
+    grid-column: auto;
+    grid-row: auto;
+    margin-left: 0;
+  }
+
+  .company-card__description {
+    height: 110px;
+    min-height: 110px;
+    max-height: 110px;
+  }
+
+  .company-card__actions {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .company-card__actions .account-action-btn,
+  .company-card__actions .account-danger-btn {
+    width: auto;
+    min-width: 0;
+  }
+
+  .admin-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .admin-row .account-danger-btn,
+  .admin-row .account-action-btn {
+    width: auto;
+    min-width: 0;
+    align-self: flex-start;
+  }
+}
+
+@media (max-width: 767px) {
+  .account-page__title {
+    margin: 96px 0 28px;
+    font-size: 24px;
+  }
+
+  .account-page__inner {
+    padding: 0 16px 28px;
+    gap: 20px;
+  }
+
+  .account-sidebar__item {
+    min-width: 140px;
+    height: 44px;
+    border-radius: 14px;
+    padding: 0 14px;
+  }
+
+  .account-sidebar__text {
+    font-size: 15px;
+  }
+
+  .account-sidebar__icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .account-block {
+    margin-bottom: 32px;
+  }
+
+  .account-block__heading {
+    font-size: 18px;
+    padding-bottom: 10px;
+  }
+
+.account-row {
+  grid-template-columns: auto auto;
+  justify-content: start;
+  gap: 12px;
+}
+
+.account-row .account-input,
+.account-row .account-textarea {
+  grid-column: 1 / -1;
+}
+
+.account-row .account-action-btn,
+.account-row .account-danger-btn {
+  justify-self: start;
+}
+
+ .account-action-btn,
+ .account-danger-btn {
+    width: auto;
+    min-width: 0;
+    height: 38px;
+    font-size: 16px;
+    padding: 0 16px;
+  }
+
+  .account-row .account-action-btn,
+  .account-row .account-danger-btn {
+    justify-self: start;
+  }
+
+  .account-muted,
+  .orders-item,
+  .admin-row__info,
+  .account-home-link {
+    font-size: 16px;
+  }
+
+  .orders-list {
+    overflow-x: auto;
+  }
+
+  .orders-head,
+  .orders-item {
+    min-width: 680px;
+    font-size: 16px;
+  }
+
+  .company-card {
+    grid-template-columns: 1fr;
+  }
+
+  .company-card__avatar {
+    margin-top: 0;
+  }
+
+  .company-card__fields {
+    grid-template-columns: 1fr;
+  }
+
+  .company-card__actions .account-action-btn,
+  .company-card__actions .account-danger-btn {
+    width: 100%;
+    min-width: 100%;
+    font-size: 16px;
+  }
+
+  .admin-section__title {
+    font-size: 18px;
+  }
+
+  .admin-row {
+    padding: 14px;
+  }
+
+  .admin-row .account-action-btn,
+  .admin-row .account-danger-btn {
+    width: auto;
+    min-width: 0;
+    align-self: flex-start;
+
+  }
+
+  .company-card__actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .company-card__actions .account-action-btn,
+  .company-card__actions .account-danger-btn {
+    width: auto;
+    min-width: 0;
+    font-size: 16px;
+  }
+}
+
+.account-events-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 40px 32px;
+}
+
+.account-events-grid .event-card {
+  max-width: 380px;
+}
+
+.account-events-grid__item {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+.account-event-card-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  border-radius: 28px;
+  overflow: hidden;
+}
+
+.account-event-card-wrap .event-card {
+  width: 100%;
+  max-width: 100%;
+  transition: transform 0.28s ease, filter 0.28s ease;
+}
+
+.account-event-card__delete-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 52%;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.28s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+}
+
+.account-event-card__delete-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(17, 17, 17, 0.34);
+}
+
+.account-event-card__delete-icon {
+  position: relative;
+  z-index: 2;
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  transition: transform 0.25s ease;
+}
+
+.account-event-card-wrap:hover .account-event-card__delete-overlay {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.account-event-card-wrap:hover .event-card {
+  filter: brightness(0.72);
+}
+
+.account-event-card-wrap:hover .account-event-card__delete-icon {
+  transform: scale(1.06);
+}
+
+@media (max-width: 1100px) {
+  .event-card__title,
+  .event-card__location,
+  .event-card__date {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+

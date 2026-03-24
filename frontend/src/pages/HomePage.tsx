@@ -2,6 +2,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { eventsApi } from '../api/events.api';
 import { companiesApi } from '../api/companies.api';
+import { Link } from 'react-router-dom';
+import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
+import { api } from '../api/axios';
 import type {
     EventCategory,
     EventFormat,
@@ -18,6 +22,7 @@ import arrowIcon from '../assets/home/arrow-icon.png';
 import ctaLeftCharacter from '../assets/home/cta-left-character.png';
 import ctaCenterCharacter from '../assets/home/cta-center-character.png';
 import ctaRightCharacter from '../assets/home/cta-right-character.png';
+import ctaFourthCharacter from '../assets/home/cta-fourth-character.png';
 import defaultCompanyAvatar from '../assets/home/default-company-avatar.png';
 import companiesArrowLeft from '../assets/home/arrow-red-icon.png';
 import companiesArrowRight from '../assets/home/arrow-red-icon.png';
@@ -60,6 +65,12 @@ function formatDateLabel(date: string) {
 }
 
 export function HomePage() {
+
+    const { isAuthenticated } = useAuth();
+    const [hasCompany, setHasCompany] = useState(false);
+    const [isCheckingCompany, setIsCheckingCompany] = useState(false);
+
+
     const [events, setEvents] = useState<EventItem[]>([]);
     const [companies, setCompanies] = useState<Company[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -72,7 +83,6 @@ export function HomePage() {
     const [category, setCategory] = useState<'' | EventCategory>('');
     const [visibleCount, setVisibleCount] = useState(6);
     const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
-    const [currentCompanyIndex, setCurrentCompanyIndex] = useState(0);
     const [bannerImageError, setBannerImageError] = useState(false);
 
     const [placeInput, setPlaceInput] = useState('');
@@ -180,20 +190,10 @@ export function HomePage() {
         return events.slice(0, visibleCount);
     }, [events, visibleCount]);
 
-    const visibleCompanies = useMemo(() => {
-        if (companies.length === 0) return [];
-
-        const result: Company[] = [];
-        const maxVisible = Math.min(4, companies.length);
-
-        for (let i = 0; i < maxVisible; i += 1) {
-            result.push(
-                companies[(currentCompanyIndex + i) % companies.length],
-            );
-        }
-
-        return result;
-    }, [companies, currentCompanyIndex]);
+    const marqueeCompanies = useMemo(() => {
+    if (companies.length === 0) return [];
+    return [...companies, ...companies];
+}, [companies]);
 
     useEffect(() => {
         if (bannerEvents.length <= 1) return;
@@ -206,27 +206,39 @@ export function HomePage() {
         return () => window.clearInterval(interval);
     }, [bannerEvents]);
 
+    useEffect(() => {
+    const fetchMyCompany = async () => {
+        if (!isAuthenticated) {
+            setHasCompany(false);
+            setIsCheckingCompany(false);
+            return;
+        }
+
+        try {
+            setIsCheckingCompany(true);
+            await api.get('/companies/my');
+            setHasCompany(true);
+        } catch (error) {
+            if (axios.isAxiosError(error) && error.response?.status === 404) {
+                setHasCompany(false);
+            } else {
+                console.error('Failed to fetch my company:', error);
+                setHasCompany(false);
+            }
+        } finally {
+            setIsCheckingCompany(false);
+        }
+    };
+
+    fetchMyCompany();
+}, [isAuthenticated]);
+
     const currentBanner = bannerEvents[currentBannerIndex] || null;
     const canLoadMore = visibleCount < events.length;
 
     const handleLoadMore = () => {
         setVisibleCount((prev) => prev + 6);
     };
-
-    const handlePrevCompanies = () => {
-        if (companies.length === 0) return;
-
-        setCurrentCompanyIndex((prev) =>
-            prev === 0 ? companies.length - 1 : prev - 1,
-        );
-    };
-
-    const handleNextCompanies = () => {
-        if (companies.length === 0) return;
-
-        setCurrentCompanyIndex((prev) => (prev + 1) % companies.length);
-    };
-
     const handleSearchKeyDown = (
         event: React.KeyboardEvent<HTMLInputElement>,
     ) => {
@@ -498,6 +510,13 @@ export function HomePage() {
                         />
 
                         <img
+    src={ctaFourthCharacter}
+    alt=""
+    className="home-cta__character home-cta__character--fourth"
+/>
+
+
+                        <img
                             src={ctaCenterCharacter}
                             alt=""
                             className="home-cta__character home-cta__character--center"
@@ -523,13 +542,23 @@ export function HomePage() {
                                         makes it special — all in one place.
                                     </p>
                                 </div>
-
-                                <button
-                                    type="button"
-                                    className="home-cta__button"
-                                >
-                                    Create
-                                </button>
+{!isAuthenticated ? (
+    <button
+        type="button"
+        className="home-cta__button"
+    >
+        Create
+    </button>
+) : (
+    !isCheckingCompany && (
+        <Link
+            to={hasCompany ? '/create-event' : '/create-company'}
+            className="home-cta__button"
+        >
+            Create
+        </Link>
+    )
+)}
                             </div>
                         </div>
                     </div>
@@ -540,60 +569,56 @@ export function HomePage() {
 
                     {companies.length > 0 ? (
                         <div className="companies-slider">
-                            <button
-                                type="button"
-                                className="companies-slider__arrow companies-slider__arrow--left"
-                                onClick={handlePrevCompanies}
-                                aria-label="Previous companies"
-                            >
-                                <img
-                                    src={companiesArrowLeft}
-                                    alt="Previous"
-                                    className="companies-slider__arrow-icon"
-                                />
-                            </button>
+    <button
+        type="button"
+        className="companies-slider__arrow companies-slider__arrow--left"
+        aria-label="Previous companies"
+    >
+        <img
+            src={companiesArrowLeft}
+            alt="Previous"
+            className="companies-slider__arrow-icon"
+        />
+    </button>
 
-                            <div className="companies-slider__track">
-                                {visibleCompanies.map((company) => (
-                                    <div
-                                        key={company.id}
-                                        className="companies-slider__item"
-                                    >
-                                        <div className="companies-slider__avatar">
-                                            <img
-                                                src={
-                                                    company.avatarUrl ||
-                                                    defaultCompanyAvatar
-                                                }
-                                                alt={company.name}
-                                                className="companies-slider__avatar-image"
-                                                onError={(e) => {
-                                                    e.currentTarget.src =
-                                                        defaultCompanyAvatar;
-                                                }}
-                                            />
-                                        </div>
+    <div className="companies-slider__viewport">
+        <div className="companies-slider__track">
+            {marqueeCompanies.map((company, index) => (
+                <div
+                    key={`${company.id}-${index}`}
+                    className="companies-slider__item"
+                >
+                    <div className="companies-slider__avatar">
+                        <img
+                            src={company.avatarUrl || defaultCompanyAvatar}
+                            alt={company.name}
+                            className="companies-slider__avatar-image"
+                            onError={(e) => {
+                                e.currentTarget.src = defaultCompanyAvatar;
+                            }}
+                        />
+                    </div>
 
-                                        <span className="companies-slider__name">
-                                            {company.name}
-                                        </span>
-                                    </div>
-                                ))}
-                            </div>
+                    <span className="companies-slider__name">
+                        {company.name}
+                    </span>
+                </div>
+            ))}
+        </div>
+    </div>
 
-                            <button
-                                type="button"
-                                className="companies-slider__arrow companies-slider__arrow--right"
-                                onClick={handleNextCompanies}
-                                aria-label="Next companies"
-                            >
-                                <img
-                                    src={companiesArrowRight}
-                                    alt="Next"
-                                    className="companies-slider__arrow-icon"
-                                />
-                            </button>
-                        </div>
+    <button
+        type="button"
+        className="companies-slider__arrow companies-slider__arrow--right"
+        aria-label="Next companies"
+    >
+        <img
+            src={companiesArrowRight}
+            alt="Next"
+            className="companies-slider__arrow-icon"
+        />
+    </button>
+</div>
                     ) : (
                         <div className="home-page__state">
                             No companies yet.
