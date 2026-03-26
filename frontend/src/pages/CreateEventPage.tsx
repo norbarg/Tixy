@@ -105,6 +105,36 @@ function parseDateTimeLocal(value: string): Date | null {
     return new Date(year, month - 1, day, hours, minutes);
 }
 
+function isSameDay(a: Date, b: Date): boolean {
+    return (
+        a.getFullYear() === b.getFullYear() &&
+        a.getMonth() === b.getMonth() &&
+        a.getDate() === b.getDate()
+    );
+}
+
+function startOfDay(date: Date): Date {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0);
+}
+
+function endOfDay(date: Date): Date {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 45, 0, 0);
+}
+
+function roundUpTo15Minutes(date: Date): Date {
+    const rounded = new Date(date);
+    rounded.setSeconds(0, 0);
+
+    const minutes = rounded.getMinutes();
+    const remainder = minutes % 15;
+
+    if (remainder !== 0) {
+        rounded.setMinutes(minutes + (15 - remainder));
+    }
+
+    return rounded;
+}
+
 function formatDateInputLabel(value?: string): string {
     if (!value) return '';
 
@@ -657,6 +687,34 @@ export function CreateEventPage() {
         }
     }
 
+    const now = new Date();
+const roundedNow = roundUpTo15Minutes(now);
+
+const startsAtDate = parseDateTimeLocal(form.startsAt);
+const endsAtDate = parseDateTimeLocal(form.endsAt);
+const publishedAtDate = parseDateTimeLocal(form.publishedAt);
+
+const startsAtMinDate = roundedNow;
+const publishedAtMinDate = roundedNow;
+const endsAtMinDate = startsAtDate || roundedNow;
+
+const startsAtMinTime =
+    startsAtDate && isSameDay(startsAtDate, now)
+        ? roundedNow
+        : startOfDay(now);
+
+const publishedAtMinTime =
+    publishedAtDate && isSameDay(publishedAtDate, now)
+        ? roundedNow
+        : startOfDay(now);
+
+const endsAtMinTime =
+    endsAtDate && startsAtDate && isSameDay(endsAtDate, startsAtDate)
+        ? startsAtDate
+        : endsAtDate && isSameDay(endsAtDate, now)
+          ? roundedNow
+          : startOfDay(now);
+
     return (
         <main className="create-event-page">
             <div className="create-event-page__inner">
@@ -975,51 +1033,46 @@ export function CreateEventPage() {
                                     <div className="create-event-fields__row create-event-fields__row--dates">
                                         <div className="event-field__date-picker">
                                             <DatePicker
-                                                selected={parseDateTimeLocal(
-                                                    form.startsAt,
-                                                )}
-                                                onChange={handleStartsAtChange}
-                                                showTimeSelect
-                                                timeIntervals={15}
-                                                dateFormat="MM/dd/yyyy h:mm aa"
-                                                placeholderText="Start in"
-                                                customInput={
-                                                    <CustomDateInput
-                                                        placeholder="Start in"
-                                                        selectedValue={
-                                                            form.startsAt
-                                                        }
-                                                        className="event-field__input--date"
-                                                    />
-                                                }
-                                            />
+    selected={parseDateTimeLocal(form.startsAt)}
+    onChange={handleStartsAtChange}
+    showTimeSelect
+    timeIntervals={15}
+    fixedHeight
+    dateFormat="MM/dd/yyyy h:mm aa"
+    minDate={startsAtMinDate}
+    minTime={startsAtMinTime}
+    maxTime={endOfDay(now)}
+    placeholderText="Start in"
+    customInput={
+        <CustomDateInput
+            placeholder="Start in"
+            selectedValue={form.startsAt}
+            className="event-field__input--date"
+        />
+    }
+/>
                                         </div>
 
                                         <div className="event-field__date-picker">
                                             <DatePicker
-                                                selected={parseDateTimeLocal(
-                                                    form.endsAt,
-                                                )}
-                                                onChange={handleEndsAtChange}
-                                                showTimeSelect
-                                                timeIntervals={15}
-                                                dateFormat="MM/dd/yyyy h:mm aa"
-                                                minDate={
-                                                    parseDateTimeLocal(
-                                                        form.startsAt,
-                                                    ) || undefined
-                                                }
-                                                placeholderText="End in"
-                                                customInput={
-                                                    <CustomDateInput
-                                                        placeholder="End in"
-                                                        selectedValue={
-                                                            form.endsAt
-                                                        }
-                                                        className="event-field__input--date"
-                                                    />
-                                                }
-                                            />
+    selected={parseDateTimeLocal(form.endsAt)}
+    onChange={handleEndsAtChange}
+    showTimeSelect
+    timeIntervals={15}
+    fixedHeight
+    dateFormat="MM/dd/yyyy h:mm aa"
+    minDate={endsAtMinDate}
+    minTime={endsAtMinTime}
+    maxTime={endOfDay(now)}
+    placeholderText="End in"
+    customInput={
+        <CustomDateInput
+            placeholder="End in"
+            selectedValue={form.endsAt}
+            className="event-field__input--date"
+        />
+    }
+/>
                                         </div>
                                     </div>
                                 </div>
@@ -1124,24 +1177,24 @@ export function CreateEventPage() {
 
                                     <div className="event-field__publication-picker">
                                         <DatePicker
-                                            selected={parseDateTimeLocal(
-                                                form.publishedAt,
-                                            )}
-                                            onChange={handlePublishedAtChange}
-                                            showTimeSelect
-                                            timeIntervals={15}
-                                            dateFormat="MM/dd/yyyy h:mm aa"
-                                            placeholderText="Add Date"
-                                            customInput={
-                                                <CustomDateInput
-                                                    placeholder="Add Date"
-                                                    selectedValue={
-                                                        form.publishedAt
-                                                    }
-                                                    className="event-field__input--publication"
-                                                />
-                                            }
-                                        />
+    selected={parseDateTimeLocal(form.publishedAt)}
+    onChange={handlePublishedAtChange}
+    showTimeSelect
+    timeIntervals={15}
+    fixedHeight
+    dateFormat="MM/dd/yyyy h:mm aa"
+    minDate={publishedAtMinDate}
+    minTime={publishedAtMinTime}
+    maxTime={endOfDay(now)}
+    placeholderText="Add Date"
+    customInput={
+        <CustomDateInput
+            placeholder="Add Date"
+            selectedValue={form.publishedAt}
+            className="event-field__input--publication"
+        />
+    }
+/>
                                     </div>
                                 </label>
 

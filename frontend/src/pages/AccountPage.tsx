@@ -92,6 +92,22 @@ export function AccountPage() {
 
     const [adminError, setAdminError] = useState('');
 
+    const [adminOpenSections, setAdminOpenSections] = useState({
+    users: false,
+    companies: false,
+    events: false,
+    comments: false,
+});
+
+function toggleAdminSection(
+    section: 'users' | 'companies' | 'events' | 'comments',
+) {
+    setAdminOpenSections((prev) => ({
+        ...prev,
+        [section]: !prev[section],
+    }));
+}
+
     useEffect(() => {
         setLoginValue(user?.login ?? '');
     }, [user]);
@@ -702,218 +718,240 @@ async function handleDeleteMyEvent(id: string) {
         )}
     </div>
 )}
+{activeSection === 'admin' && (
+    <div className="account-block account-scroll-item">
+        <h2 className="account-block__heading">ADMIN PANEL</h2>
 
-                    {activeSection === 'admin' && (
-                        <div className="account-block account-scroll-item">
-                            <h2 className="account-block__heading">
-                                ADMIN PANEL
-                            </h2>
+        {adminError ? <p className="account-error">{adminError}</p> : null}
 
-                            {adminError ? (
-                                <p className="account-error">{adminError}</p>
-                            ) : null}
+        <div className="admin-accordion">
+            <div className="admin-accordion__item">
+                <button
+                    type="button"
+                    className={`admin-accordion__header ${
+                        adminOpenSections.users ? 'is-open' : ''
+                    }`}
+                    onClick={() => toggleAdminSection('users')}
+                >
+                    <span>Users</span>
+                    <span className="admin-accordion__icon">
+                        {adminOpenSections.users ? '−' : '+'}
+                    </span>
+                </button>
 
-                            <div className="admin-section">
-                                <h3 className="admin-section__title">Users</h3>
-                                {adminUsersLoading ? (
-                                    <p className="account-muted">Loading...</p>
-                                ) : adminUsers.length === 0 ? (
-                                    <p className="account-muted">
-                                        No users found.
-                                    </p>
-                                ) : (
-                                    <div className="admin-list">
-                                        {adminUsers.map((item) => (
-                                            <div
-                                                key={item.id}
-                                                className="admin-row"
-                                            >
-                                                <div className="admin-row__info">
-                                                    <p>
-                                                        <strong>Login:</strong>{' '}
-                                                        {item.login}
-                                                    </p>
-                                                    <p>
-                                                        <strong>Email:</strong>{' '}
-                                                        {item.email}
-                                                    </p>
-                                                    <p>
-                                                        <strong>Role:</strong>{' '}
-                                                        {item.role}
-                                                    </p>
-                                                </div>
+                {adminOpenSections.users && (
+                    <div className="admin-accordion__body">
+                        {adminUsersLoading ? (
+                            <p className="account-muted">Loading...</p>
+                        ) : adminUsers.length === 0 ? (
+                            <p className="account-muted">No users found.</p>
+                        ) : (
+                            <div className="admin-list">
+                                {adminUsers.map((item) => (
+                                    <div key={item.id} className="admin-row">
+                                        <div className="admin-row__info">
+                                            <p>
+                                                <strong>Login:</strong>{' '}
+                                                {item.login}
+                                            </p>
+                                            <p>
+                                                <strong>Email:</strong>{' '}
+                                                {item.email}
+                                            </p>
+                                            <p>
+                                                <strong>Role:</strong>{' '}
+                                                {item.role}
+                                            </p>
+                                        </div>
 
-                                                <button
-                                                    className="account-danger-btn"
-                                                    onClick={() =>
-                                                        handleAdminDeleteUser(
-                                                            item.id,
-                                                        )
-                                                    }
-                                                >
-                                                    Delete
-                                                </button>
-                                            </div>
-                                        ))}
+                                        <button
+                                            className="account-danger-btn"
+                                            onClick={() =>
+                                                handleAdminDeleteUser(item.id)
+                                            }
+                                        >
+                                            Delete
+                                        </button>
                                     </div>
-                                )}
+                                ))}
                             </div>
+                        )}
+                    </div>
+                )}
+            </div>
 
-                            <div className="admin-section">
-                                <h3 className="admin-section__title">
-                                    Companies
-                                </h3>
-                                {adminCompaniesLoading ? (
-                                    <p className="account-muted">Loading...</p>
-                                ) : adminCompanies.length === 0 ? (
-                                    <p className="account-muted">
-                                        No companies found.
-                                    </p>
-                                ) : (
-                                    <div className="admin-list">
-                                        {adminCompanies.map((item) => (
-                                            <div
-                                                key={item.id}
-                                                className="admin-row"
-                                            >
-                                                <div className="admin-row__info">
-                                                    <p>
-                                                        <strong>Name:</strong>{' '}
-                                                        {item.name}
-                                                    </p>
-                                                    <p>
-                                                        <strong>Email:</strong>{' '}
-                                                        {item.email}
-                                                    </p>
-                                                    <p>
-                                                        <strong>
-                                                            Address:
-                                                        </strong>{' '}
-                                                        {item.placeAddress ??
-                                                            '-'}
-                                                    </p>
-                                                </div>
+            <div className="admin-accordion__item">
+                <button
+                    type="button"
+                    className={`admin-accordion__header ${
+                        adminOpenSections.companies ? 'is-open' : ''
+                    }`}
+                    onClick={() => toggleAdminSection('companies')}
+                >
+                    <span>Companies</span>
+                    <span className="admin-accordion__icon">
+                        {adminOpenSections.companies ? '−' : '+'}
+                    </span>
+                </button>
 
-                                                <button
-                                                    className="account-danger-btn"
-                                                    onClick={() =>
-                                                        handleAdminDeleteCompany(
-                                                            item.id,
-                                                        )
-                                                    }
-                                                >
-                                                    Delete
-                                                </button>
-                                            </div>
-                                        ))}
+                {adminOpenSections.companies && (
+                    <div className="admin-accordion__body">
+                        {adminCompaniesLoading ? (
+                            <p className="account-muted">Loading...</p>
+                        ) : adminCompanies.length === 0 ? (
+                            <p className="account-muted">No companies found.</p>
+                        ) : (
+                            <div className="admin-list">
+                                {adminCompanies.map((item) => (
+                                    <div key={item.id} className="admin-row">
+                                        <div className="admin-row__info">
+                                            <p>
+                                                <strong>Name:</strong>{' '}
+                                                {item.name}
+                                            </p>
+                                            <p>
+                                                <strong>Email:</strong>{' '}
+                                                {item.email}
+                                            </p>
+                                            <p>
+                                                <strong>Address:</strong>{' '}
+                                                {item.placeAddress ?? '-'}
+                                            </p>
+                                        </div>
+
+                                        <button
+                                            className="account-danger-btn"
+                                            onClick={() =>
+                                                handleAdminDeleteCompany(
+                                                    item.id,
+                                                )
+                                            }
+                                        >
+                                            Delete
+                                        </button>
                                     </div>
-                                )}
+                                ))}
                             </div>
+                        )}
+                    </div>
+                )}
+            </div>
 
-                            <div className="admin-section">
-                                <h3 className="admin-section__title">Events</h3>
-                                {adminEventsLoading ? (
-                                    <p className="account-muted">Loading...</p>
-                                ) : adminEvents.length === 0 ? (
-                                    <p className="account-muted">
-                                        No events found.
-                                    </p>
-                                ) : (
-                                    <div className="admin-list">
-                                        {adminEvents.map((item) => (
-                                            <div
-                                                key={item.id}
-                                                className="admin-row"
-                                            >
-                                                <div className="admin-row__info">
-                                                    <p>
-                                                        <strong>Title:</strong>{' '}
-                                                        {item.title}
-                                                    </p>
-                                                    <p>
-                                                        <strong>
-                                                            Category:
-                                                        </strong>{' '}
-                                                        {item.category}
-                                                    </p>
-                                                    <p>
-                                                        <strong>Place:</strong>{' '}
-                                                        {item.placeAddress ??
-                                                            item.placeName}
-                                                    </p>
-                                                </div>
+            <div className="admin-accordion__item">
+                <button
+                    type="button"
+                    className={`admin-accordion__header ${
+                        adminOpenSections.events ? 'is-open' : ''
+                    }`}
+                    onClick={() => toggleAdminSection('events')}
+                >
+                    <span>Events</span>
+                    <span className="admin-accordion__icon">
+                        {adminOpenSections.events ? '−' : '+'}
+                    </span>
+                </button>
 
-                                                <button
-                                                    className="account-danger-btn"
-                                                    onClick={() =>
-                                                        handleAdminDeleteEvent(
-                                                            item.id,
-                                                        )
-                                                    }
-                                                >
-                                                    Delete
-                                                </button>
-                                            </div>
-                                        ))}
+                {adminOpenSections.events && (
+                    <div className="admin-accordion__body">
+                        {adminEventsLoading ? (
+                            <p className="account-muted">Loading...</p>
+                        ) : adminEvents.length === 0 ? (
+                            <p className="account-muted">No events found.</p>
+                        ) : (
+                            <div className="admin-list">
+                                {adminEvents.map((item) => (
+                                    <div key={item.id} className="admin-row">
+                                        <div className="admin-row__info">
+                                            <p>
+                                                <strong>Title:</strong>{' '}
+                                                {item.title}
+                                            </p>
+                                            <p>
+                                                <strong>Category:</strong>{' '}
+                                                {item.category}
+                                            </p>
+                                            <p>
+                                                <strong>Place:</strong>{' '}
+                                                {item.placeAddress ??
+                                                    item.placeName}
+                                            </p>
+                                        </div>
+
+                                        <button
+                                            className="account-danger-btn"
+                                            onClick={() =>
+                                                handleAdminDeleteEvent(item.id)
+                                            }
+                                        >
+                                            Delete
+                                        </button>
                                     </div>
-                                )}
+                                ))}
                             </div>
+                        )}
+                    </div>
+                )}
+            </div>
 
-                            <div className="admin-section">
-                                <h3 className="admin-section__title">
-                                    Comments
-                                </h3>
-                                {adminCommentsLoading ? (
-                                    <p className="account-muted">Loading...</p>
-                                ) : adminComments.length === 0 ? (
-                                    <p className="account-muted">
-                                        No comments found.
-                                    </p>
-                                ) : (
-                                    <div className="admin-list">
-                                        {adminComments.map((item) => (
-                                            <div
-                                                key={item.id}
-                                                className="admin-row"
-                                            >
-                                                <div className="admin-row__info">
-                                                    <p>
-                                                        <strong>
-                                                            Comment:
-                                                        </strong>{' '}
-                                                        {item.content}
-                                                    </p>
-                                                    <p>
-                                                        <strong>
-                                                            Event ID:
-                                                        </strong>{' '}
-                                                        {item.eventId}
-                                                    </p>
-                                                    <p>
-                                                        <strong>
-                                                            Author ID:
-                                                        </strong>{' '}
-                                                        {item.authorUserId}
-                                                    </p>
-                                                </div>
+            <div className="admin-accordion__item">
+                <button
+                    type="button"
+                    className={`admin-accordion__header ${
+                        adminOpenSections.comments ? 'is-open' : ''
+                    }`}
+                    onClick={() => toggleAdminSection('comments')}
+                >
+                    <span>Comments</span>
+                    <span className="admin-accordion__icon">
+                        {adminOpenSections.comments ? '−' : '+'}
+                    </span>
+                </button>
 
-                                                <button
-                                                    className="account-danger-btn"
-                                                    onClick={() =>
-                                                        handleAdminDeleteComment(
-                                                            item.id,
-                                                        )
-                                                    }
-                                                >
-                                                    Delete
-                                                </button>
-                                            </div>
-                                        ))}
+                {adminOpenSections.comments && (
+                    <div className="admin-accordion__body">
+                        {adminCommentsLoading ? (
+                            <p className="account-muted">Loading...</p>
+                        ) : adminComments.length === 0 ? (
+                            <p className="account-muted">No comments found.</p>
+                        ) : (
+                            <div className="admin-list">
+                                {adminComments.map((item) => (
+                                    <div key={item.id} className="admin-row">
+                                        <div className="admin-row__info">
+                                            <p>
+                                                <strong>Comment:</strong>{' '}
+                                                {item.content}
+                                            </p>
+                                            <p>
+                                                <strong>Event ID:</strong>{' '}
+                                                {item.eventId}
+                                            </p>
+                                            <p>
+                                                <strong>Author ID:</strong>{' '}
+                                                {item.authorUserId}
+                                            </p>
+                                        </div>
+
+                                        <button
+                                            className="account-danger-btn"
+                                            onClick={() =>
+                                                handleAdminDeleteComment(
+                                                    item.id,
+                                                )
+                                            }
+                                        >
+                                            Delete
+                                        </button>
                                     </div>
-                                )}
+                                ))}
                             </div>
-                        </div>
-                    )}
+                        )}
+                    </div>
+                )}
+            </div>
+        </div>
+    </div>
+)}
 
                     {activeSection === 'settings' && (
                         <>
