@@ -1,14 +1,29 @@
-// Header.tsx
 import { Link } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
+import { useCart } from '../../context/CartContext';
 import { api } from '../../api/axios';
+import {
+    notificationsApi,
+    type NotificationItem,
+} from '../../api/notifications.api';
 import logo from '../../assets/auth/logo.png';
 import flagUs from '../../assets/auth/flag-us.png';
 import bellIcon from '../../assets/auth/bell.png';
 import cartIcon from '../../assets/auth/cart.png';
 import './header.css';
+
+function formatNotificationTime(value: string) {
+    const date = new Date(value);
+
+    return date.toLocaleString('en-US', {
+        day: '2-digit',
+        month: 'short',
+        hour: '2-digit',
+        minute: '2-digit',
+    });
+}
 
 export function Header() {
     const { openAuthModal, isAuthenticated } = useAuth();
@@ -17,9 +32,21 @@ export function Header() {
     const [hasCompany, setHasCompany] = useState(false);
     const [isCheckingCompany, setIsCheckingCompany] = useState(false);
 
-    const hasNewNotifications = true;
-    const hasNewCartItems = false;
-    const cartTotal = '$00.00';
+    const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+    const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+    const [isNotificationsLoading, setIsNotificationsLoading] = useState(false);
+
+    const notificationsRef = useRef<HTMLDivElement | null>(null);
+
+    const { subtotal, hasItems } = useCart();
+    const hasNewCartItems = hasItems;
+    const cartTotal = subtotal === 0 ? '$00.00' : `$${subtotal.toFixed(2)}`;
+
+    const unreadCount = useMemo(() => {
+        return notifications.filter((item) => !item.isRead).length;
+    }, [notifications]);
+
+    const hasNewNotifications = unreadCount > 0;
 
     const toggleMenu = () => {
         setIsMenuOpen((prev) => !prev);
@@ -41,6 +68,23 @@ export function Header() {
     }, []);
 
     useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (
+                notificationsRef.current &&
+                !notificationsRef.current.contains(event.target as Node)
+            ) {
+                setIsNotificationsOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
+    useEffect(() => {
         const fetchMyCompany = async () => {
             if (!isAuthenticated) {
                 setHasCompany(false);
@@ -53,7 +97,10 @@ export function Header() {
                 await api.get('/companies/my');
                 setHasCompany(true);
             } catch (error) {
-                if (axios.isAxiosError(error) && error.response?.status === 404) {
+                if (
+                    axios.isAxiosError(error) &&
+                    error.response?.status === 404
+                ) {
                     setHasCompany(false);
                 } else {
                     console.error('Failed to fetch my company:', error);
@@ -66,6 +113,55 @@ export function Header() {
 
         fetchMyCompany();
     }, [isAuthenticated]);
+
+    useEffect(() => {
+        const fetchNotifications = async () => {
+            if (!isAuthenticated) {
+                setNotifications([]);
+                return;
+            }
+
+            try {
+                const data = await notificationsApi.getMyNotifications();
+                setNotifications(data);
+            } catch (error) {
+                console.error('Failed to fetch notifications:', error);
+            }
+        };
+
+        fetchNotifications();
+    }, [isAuthenticated]);
+
+    const handleBellClick = async () => {
+        if (!isAuthenticated) return;
+
+        const nextOpen = !isNotificationsOpen;
+        setIsNotificationsOpen(nextOpen);
+
+        if (!nextOpen) return;
+
+        try {
+            setIsNotificationsLoading(true);
+
+            const data = await notificationsApi.getMyNotifications();
+            setNotifications(data);
+
+            if (data.some((item) => !item.isRead)) {
+                await notificationsApi.markAllAsRead();
+
+                setNotifications((prev) =>
+                    prev.map((item) => ({
+                        ...item,
+                        isRead: true,
+                    })),
+                );
+            }
+        } catch (error) {
+            console.error('Failed to open notifications:', error);
+        } finally {
+            setIsNotificationsLoading(false);
+        }
+    };
 
     return (
         <header className="header">
@@ -132,11 +228,17 @@ export function Header() {
 
                             {!isCheckingCompany && (
                                 <Link
-                                    to={hasCompany ? '/create-event' : '/create-company'}
+                                    to={
+                                        hasCompany
+                                            ? '/create-event'
+                                            : '/create-company'
+                                    }
                                     className="header__nav-link"
                                     onClick={closeMenu}
                                 >
-                                    {hasCompany ? 'Create Event' : 'Create Company'}
+                                    {hasCompany
+                                        ? 'Create Event'
+                                        : 'Create Company'}
                                 </Link>
                             )}
 
@@ -148,19 +250,75 @@ export function Header() {
                                 Account
                             </Link>
 
-                            <button
-                                className="header__icon-btn header__icon-btn--bell"
-                                type="button"
+                            <div
+                                className="header__notifications"
+                                ref={notificationsRef}
                             >
-                                <img
-                                    src={bellIcon}
-                                    alt="Notifications"
-                                    className="header__icon"
-                                />
-                                {hasNewNotifications && (
-                                    <span className="header__dot" />
+                                <button
+                                    className="header__icon-btn header__icon-btn--bell"
+                                    type="button"
+                                    onClick={handleBellClick}
+                                >
+                                    <img
+                                        src={bellIcon}
+                                        alt="Notifications"
+                                        className="header__icon"
+                                    />
+                                    {hasNewNotifications && (
+                                        <>
+                                            <span className="header__dot" />
+                                        </>
+                                    )}
+                                </button>
+
+                                {isNotificationsOpen && (
+                                    <div className="header__notifications-popover">
+                                        {isNotificationsLoading ? (
+                                            <div className="header__notifications-empty">
+                                                Loading...
+                                            </div>
+                                        ) : notifications.length > 0 ? (
+                                            <div className="header__notifications-list">
+                                                {notifications
+                                                    .slice(0, 6)
+                                                    .map((notification) => (
+                                                        <button
+                                                            key={
+                                                                notification.id
+                                                            }
+                                                            type="button"
+                                                            className={`header__notification-item ${
+                                                                notification.isRead
+                                                                    ? 'is-read'
+                                                                    : ''
+                                                            }`}
+                                                        >
+                                                            <div className="header__notification-title">
+                                                                {
+                                                                    notification.title
+                                                                }
+                                                            </div>
+                                                            <div className="header__notification-body">
+                                                                {
+                                                                    notification.body
+                                                                }
+                                                            </div>
+                                                            <div className="header__notification-time">
+                                                                {formatNotificationTime(
+                                                                    notification.createdAt,
+                                                                )}
+                                                            </div>
+                                                        </button>
+                                                    ))}
+                                            </div>
+                                        ) : (
+                                            <div className="header__notifications-empty">
+                                                No notifications yet.
+                                            </div>
+                                        )}
+                                    </div>
                                 )}
-                            </button>
+                            </div>
 
                             <button className="header__cart" type="button">
                                 <span className="header__cart-price">

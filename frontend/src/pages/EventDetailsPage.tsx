@@ -12,6 +12,7 @@ import { EventMap } from '../components/maps/EventMap';
 import { EventCard } from '../components/home/EventCard';
 import { Footer } from '../components/layout/Footer';
 import { useAuth } from '../context/AuthContext';
+import { useCart } from '../context/CartContext';
 import type { EventItem } from '../types/event.types';
 import type { Company } from '../types/company.types';
 import type { CommentItem } from '../types/comment.types';
@@ -95,6 +96,8 @@ export function EventDetailsPage() {
     const [bannerImageError, setBannerImageError] = useState(false);
     const [companyAvatarError, setCompanyAvatarError] = useState(false);
 
+    const { setCartItem, clearCart } = useCart();
+
     const [visibleCompanyEventsCount, setVisibleCompanyEventsCount] =
         useState(3);
     const [visibleSimilarEventsCount, setVisibleSimilarEventsCount] =
@@ -155,6 +158,26 @@ export function EventDetailsPage() {
 
         load();
     }, [id, isAuthenticated]);
+
+    useEffect(() => {
+        if (!event) {
+            clearCart();
+            return;
+        }
+
+        setCartItem({
+            eventId: event.id,
+            title: event.title,
+            unitPrice: Number(event.price || 0),
+            quantity,
+        });
+    }, [event, quantity, setCartItem, clearCart]);
+
+    useEffect(() => {
+        return () => {
+            clearCart();
+        };
+    }, [clearCart]);
 
     useEffect(() => {
         setBannerImageError(false);

@@ -17,6 +17,7 @@ import { PaymentsModule } from './modules/payments/payments.module';
 import { TicketsModule } from './modules/tickets/tickets.module';
 import { MailModule } from './modules/mail/mail.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { ScheduleModule } from '@nestjs/schedule';
 import * as path from 'path';
 import { UploadsModule } from './modules/uploads/uploads.module';
 
@@ -63,6 +64,7 @@ import { JwtGlobalGuard } from './common/guards/jwt-global.guard';
     TicketsModule,
     MailModule,
     UploadsModule,
+    ScheduleModule.forRoot(),
   ],
   providers: [
     {

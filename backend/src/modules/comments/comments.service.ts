@@ -8,6 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Comment } from '../../database/entities/comments.entity';
 import { Event } from '../../database/entities/events.entity';
+import { User } from '../../database/entities/users.entity';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UserRole } from '../../common/enums/user-role.enum';
 
@@ -18,6 +19,8 @@ export class CommentsService {
     private readonly commentsRepository: Repository<Comment>,
     @InjectRepository(Event)
     private readonly eventsRepository: Repository<Event>,
+    @InjectRepository(User)
+    private readonly usersRepository: Repository<User>,
   ) {}
 
   findById(id: string): Promise<Comment | null> {
@@ -27,11 +30,31 @@ export class CommentsService {
   }
 
   async getAllComments() {
-    const comments = await this.commentsRepository.find({
-      order: { createdAt: 'DESC' },
-    });
+    const comments = await this.commentsRepository
+      .createQueryBuilder('comment')
+      .leftJoin(Event, 'event', 'event.id = comment.eventId')
+      .leftJoin(User, 'user', 'user.id = comment.authorUserId')
+      .select([
+        'comment.id AS id',
+        'comment.eventId AS "eventId"',
+        'comment.authorUserId AS "authorUserId"',
+        'comment.content AS content',
+        'comment.createdAt AS "createdAt"',
+        'event.title AS "eventTitle"',
+        'user.login AS "authorLogin"',
+      ])
+      .orderBy('comment.createdAt', 'DESC')
+      .getRawMany();
 
-    return comments.map((comment) => this.sanitizeComment(comment));
+    return comments.map((comment) => ({
+      id: comment.id,
+      eventId: comment.eventId,
+      authorUserId: comment.authorUserId,
+      content: comment.content,
+      createdAt: comment.createdAt,
+      eventTitle: comment.eventTitle ?? null,
+      authorLogin: comment.authorLogin ?? null,
+    }));
   }
 
   async create(authorUserId: string, dto: CreateCommentDto) {

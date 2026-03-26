@@ -106,6 +106,9 @@ export class EventsService {
       now,
     });
 
+    qb.andWhere('event.endsAt >= :now', {
+      now,
+    });
     if (query.format) {
       qb.andWhere('event.format = :format', {
         format: query.format,
@@ -171,8 +174,14 @@ export class EventsService {
 
   async getPublicById(id: string) {
     const event = await this.findById(id);
+    const now = new Date();
 
-    if (!event || event.status !== EventStatus.PUBLISHED) {
+    if (
+      !event ||
+      event.status !== EventStatus.PUBLISHED ||
+      event.publishedAt > now ||
+      event.endsAt < now
+    ) {
       throw new NotFoundException('Event not found');
     }
 
@@ -218,20 +227,21 @@ export class EventsService {
     }
   }
 
-  async getMyEvents(ownerUserId: string) { // events created by me
-  const company = await this.findCompanyByOwnerUserId(ownerUserId);
+  async getMyEvents(ownerUserId: string) {
+    // events created by me
+    const company = await this.findCompanyByOwnerUserId(ownerUserId);
 
-  if (!company) {
-    return [];
+    if (!company) {
+      return [];
+    }
+
+    const events = await this.eventsRepository.find({
+      where: { companyId: company.id },
+      order: { createdAt: 'DESC' },
+    });
+
+    return events.map((event) => this.sanitizePrivateEvent(event));
   }
-
-  const events = await this.eventsRepository.find({
-    where: { companyId: company.id },
-    order: { createdAt: 'DESC' },
-  });
-
-  return events.map((event) => this.sanitizePrivateEvent(event));
-}
 
   private sanitizePublicEvent(event: Event) {
     return {

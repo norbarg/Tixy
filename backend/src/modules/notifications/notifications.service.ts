@@ -14,6 +14,8 @@ import { Event } from '../../database/entities/events.entity';
 import { Company } from '../../database/entities/companies.entity';
 import { MailService } from '../mail/mail.service';
 import { NotificationType } from '../../common/enums/notification-type.enum';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import { Between } from 'typeorm';
 
 @Injectable()
 export class NotificationsService {
@@ -32,6 +34,28 @@ export class NotificationsService {
     private readonly companiesRepository: Repository<Company>,
     private readonly mailService: MailService,
   ) {}
+
+  @Cron(CronExpression.EVERY_MINUTE)
+  async handleEventReminders() {
+    const now = new Date();
+
+    const from = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+    const to = new Date(from.getTime() + 60 * 1000);
+
+    const events = await this.eventsRepository.find({
+      where: {
+        startsAt: Between(from, to),
+      },
+    });
+
+    if (events.length === 0) {
+      return;
+    }
+
+    for (const event of events) {
+      await this.createEventReminderNotifications(event.id);
+    }
+  }
 
   async getMyNotifications(userId: string) {
     const notifications = await this.notificationsRepository.find({
@@ -187,7 +211,28 @@ export class NotificationsService {
     const title = `Reminder: ${event.title} starts in 24 hours`;
     const body = `Your subscribed event "${event.title}" will start in 24 hours.`;
 
-    const notifications = users.map((user) =>
+    const existingNotifications = await this.notificationsRepository.find({
+      where: {
+        userId: In(userIds),
+        type: NotificationType.EVENT_REMINDER,
+        title,
+        body,
+      },
+    });
+
+    const alreadyNotifiedUserIds = new Set(
+      existingNotifications.map((item) => item.userId),
+    );
+
+    const usersToNotify = users.filter(
+      (user) => !alreadyNotifiedUserIds.has(user.id),
+    );
+
+    if (usersToNotify.length === 0) {
+      return;
+    }
+
+    const notifications = usersToNotify.map((user) =>
       this.notificationsRepository.create({
         userId: user.id,
         type: NotificationType.EVENT_REMINDER,
@@ -202,7 +247,7 @@ export class NotificationsService {
     await this.notificationsRepository.save(notifications);
 
     await Promise.all(
-      users.map(async (user) => {
+      usersToNotify.map(async (user) => {
         try {
           await this.mailService.sendSimpleEmail({
             to: user.email,
