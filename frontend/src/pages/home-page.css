@@ -743,3 +743,194 @@
         font-size: 16px;
     }
 }
+
+.home-datepicker-popper {
+    z-index: 1000 !important;
+    padding-top: 10px !important;
+}
+
+.home-datepicker {
+    font-family: inherit !important;
+    border: 1px solid #000000 !important;
+    border-radius: 20px !important;
+    overflow: hidden !important;
+    background: #f7f7f7 !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18) !important;
+}
+
+.home-datepicker .react-datepicker__triangle {
+    display: none !important;
+}
+
+.home-datepicker .react-datepicker__header {
+    position: relative;
+    background: #111111 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 18px 18px 10px !important;
+}
+
+
+.home-datepicker .react-datepicker__current-month {
+    font-size: 18px !important;
+    font-weight: 600 !important;
+    color: #ffffff !important;
+}
+
+.home-datepicker .react-datepicker__navigation {
+    top: 18px !important;
+}
+
+.home-datepicker .react-datepicker__navigation:hover .react-datepicker__navigation-icon::before {
+    border-color: #d2222f !important;
+}
+
+.home-datepicker .react-datepicker__navigation-icon::before {
+    border-color: #bfc5cf !important;
+    border-width: 2px 2px 0 0 !important;
+    height: 5px !important;
+    width: 5px !important;
+    border-style: solid;
+    content: '';
+    display: block;
+    position: absolute;
+    top: -10px;
+}
+
+.home-datepicker .react-datepicker__day-names {
+    display: grid !important;
+    grid-template-columns: repeat(7, 2.5rem);
+    justify-content: space-between;
+    margin-bottom: 8px !important;
+}
+
+.home-datepicker .react-datepicker__week {
+    display: grid !important;
+    grid-template-columns: repeat(7, 2.5rem);
+    justify-content: space-between;
+}
+.home-datepicker .react-datepicker__day-name {
+    width: 2.5rem !important;
+    line-height: 2.5rem !important;
+    margin: 0 !important;
+    color: #d2222f !important;
+    font-size: 14px !important;
+    font-weight: 400 !important;
+}
+
+.home-datepicker .react-datepicker__week {
+    display: flex;
+    justify-content: space-between;
+}
+
+.home-datepicker .react-datepicker__day {
+    width: 2.5rem !important;
+    line-height: 2.5rem !important;
+    margin: 0 !important;
+    border-radius: 10px !important;
+    font-size: 14px !important;
+    font-weight: 400 !important;
+    color: #ffffff !important;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.home-datepicker .react-datepicker__day:hover {
+    background: #242424 !important;
+    color: #ffffff !important;
+}
+
+.home-datepicker .react-datepicker__day--selected,
+.home-datepicker .react-datepicker__day--keyboard-selected {
+    background: #d2222f !important;
+    color: #fff !important;
+}
+
+.home-datepicker .react-datepicker__day--today {
+    font-weight: 400 !important;
+}
+
+.home-datepicker .react-datepicker__day--outside-month {
+    color: #2D3540 !important;
+}
+
+.home-datepicker .react-datepicker__month-container {
+    background: #111111 !important;
+}
+
+.home-datepicker__footer-btn {
+    border: none;
+    background: transparent;
+    padding: 0;
+    font: inherit;
+    font-size: 15px;
+    font-weight: 500;
+    color: #ffffff;
+    cursor: pointer;
+}
+
+.home-datepicker__footer-btn:hover {
+    opacity: 0.75;
+}
+
+.home-datepicker-shell {
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.home-datepicker__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 18px 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background: #111111;
+}
+
+.home-section__select-wrap {
+    position: relative;
+}
+
+.home-section__select-btn {
+    text-align: left;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+.home-section__select-option:last-child {
+    border-bottom: none;
+}
+
+.home-section__select-option {
+    width: 100%;
+    border: none;
+     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: transparent;
+    color: #ffffff;
+    text-align: left;
+    padding: 12px 16px;
+    font: inherit;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.home-section__select-option:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.home-section__select-option.is-active {
+    color: #d2222f;
+}
+
+.home-section__select-popup {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 0;
+    min-width: 100%;
+    background: #111111;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 0;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.22);
+    z-index: 30;
+    overflow: hidden;
+}

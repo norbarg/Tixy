@@ -1,5 +1,5 @@
 //src/pages/HomePage.tsx
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { forwardRef, useEffect, useMemo, useRef, useState } from 'react';
 import { eventsApi } from '../api/events.api';
 import { companiesApi } from '../api/companies.api';
 import { Link } from 'react-router-dom';
@@ -15,6 +15,8 @@ import type { Company } from '../types/company.types';
 import { EventCard } from '../components/home/EventCard';
 import { Footer } from '../components/layout/Footer';
 import { searchPlaces, type PlaceSuggestion } from '../lib/photon';
+import DatePicker, { CalendarContainer } from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 import defaultBanner from '../assets/home/default-banner.png';
 import searchIcon from '../assets/home/search-icon.png';
@@ -64,6 +66,36 @@ function formatDateLabel(date: string) {
     });
 }
 
+type DateTriggerProps = {
+    value?: string;
+    onClick?: () => void;
+};
+
+const DateTrigger = forwardRef<HTMLButtonElement, DateTriggerProps>(
+    ({ value, onClick }, ref) => {
+        return (
+            <button
+                type="button"
+                className="home-search__date-trigger"
+                onClick={onClick}
+                ref={ref}
+            >
+                <span className="home-search__date-value">
+                    {value || 'Any date'}
+                </span>
+
+                <img
+                    src={arrowIcon}
+                    alt="arrow"
+                    className="home-search__date-arrow-image"
+                />
+            </button>
+        );
+    },
+);
+
+DateTrigger.displayName = 'DateTrigger';
+
 export function HomePage() {
 
     const { isAuthenticated } = useAuth();
@@ -89,13 +121,48 @@ export function HomePage() {
     const [placeSuggestions, setPlaceSuggestions] = useState<PlaceSuggestion[]>(
         [],
     );
+    const [isFormatOpen, setIsFormatOpen] = useState(false);
+    const [isCategoryOpen, setIsCategoryOpen] = useState(false);
     const [isPlaceOpen, setIsPlaceOpen] = useState(false);
     const [isPlaceLoading, setIsPlaceLoading] = useState(false);
     const [, setSelectedPlace] = useState<PlaceSuggestion | null>(null);
-
     const placeRef = useRef<HTMLDivElement | null>(null);
+    const formatRef = useRef<HTMLDivElement | null>(null);
+    const categoryRef = useRef<HTMLDivElement | null>(null);
 
-    const dateInputRef = useRef<HTMLInputElement | null>(null);
+    useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+        if (
+            categoryRef.current &&
+            !categoryRef.current.contains(event.target as Node)
+        ) {
+            setIsCategoryOpen(false);
+        }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+    };
+}, []);
+
+    useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+        if (
+            formatRef.current &&
+            !formatRef.current.contains(event.target as Node)
+        ) {
+            setIsFormatOpen(false);
+        }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+    };
+}, []);
 
     useEffect(() => {
         const timeoutId = window.setTimeout(() => {
@@ -248,22 +315,6 @@ export function HomePage() {
         }
     };
 
-    const openDatePicker = () => {
-        if (!dateInputRef.current) return;
-
-        const input = dateInputRef.current as HTMLInputElement & {
-            showPicker?: () => void;
-        };
-
-        if (typeof input.showPicker === 'function') {
-            input.showPicker();
-            return;
-        }
-
-        input.focus();
-        input.click();
-    };
-
     const bannerImageSrc =
         currentBanner?.bannerUrl && !bannerImageError
             ? currentBanner.bannerUrl
@@ -386,34 +437,64 @@ export function HomePage() {
                             </div>
 
                             <div className="home-search__item">
-                                <label className="home-search__label">
-                                    Time
-                                </label>
+    <label className="home-search__label">Time</label>
+    <DatePicker
+    selected={date ? new Date(`${date}T00:00:00`) : null}
+    onChange={(selectedDate: Date | null) => {
+        if (!selectedDate) {
+            setDate('');
+            return;
+        }
 
-                                <button
-                                    type="button"
-                                    className="home-search__date-trigger"
-                                    onClick={openDatePicker}
-                                >
-                                    <span className="home-search__date-value">
-                                        {formatDateLabel(date)}
-                                    </span>
+        const year = selectedDate.getFullYear();
+        const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+        const day = String(selectedDate.getDate()).padStart(2, '0');
 
-                                    <img
-                                        src={arrowIcon}
-                                        alt="arrow"
-                                        className="home-search__date-arrow-image"
-                                    />
-                                </button>
+        setDate(`${year}-${month}-${day}`);
+    }}
+    customInput={<DateTrigger value={formatDateLabel(date)} />}
+    dateFormat="MMM d, yyyy"
+    placeholderText="Any date"
+    popperPlacement="bottom-start"
+    calendarClassName="home-datepicker"
+    popperClassName="home-datepicker-popper"
+    isClearable={false}
+    shouldCloseOnSelect
+calendarContainer={({ className, children }) => (
+    <CalendarContainer className={`${className} home-datepicker-shell`}>
+        {children}
 
-                                <input
-                                    ref={dateInputRef}
-                                    type="date"
-                                    className="home-search__date-native"
-                                    value={date}
-                                    onChange={(e) => setDate(e.target.value)}
-                                />
-                            </div>
+        <div className="home-datepicker__footer">
+            <button
+                type="button"
+                className="home-datepicker__footer-btn"
+                onClick={() => {
+                    setDate('');
+                }}
+            >
+                Clear
+            </button>
+
+            <button
+                type="button"
+                className="home-datepicker__footer-btn"
+                onClick={() => {
+                    const today = new Date();
+                    const year = today.getFullYear();
+                    const month = String(today.getMonth() + 1).padStart(2, '0');
+                    const day = String(today.getDate()).padStart(2, '0');
+
+                    setDate(`${year}-${month}-${day}`);
+                }}
+            >
+                Today
+            </button>
+        </div>
+    </CalendarContainer>
+)}
+/>
+</div>
+
                         </div>
                     </div>
                 </section>
@@ -423,51 +504,60 @@ export function HomePage() {
                         <h2 className="home-section__title">Upcoming Events</h2>
 
                         <div className="home-section__filters">
-                            <div className="home-section__select-wrap">
-                                <select
-                                    className="home-section__select"
-                                    value={format}
-                                    onChange={(e) =>
-                                        setFormat(
-                                            e.target.value as '' | EventFormat,
-                                        )
-                                    }
-                                >
-                                    {formatOptions.map((option) => (
-                                        <option
-                                            key={option.value || 'all-formats'}
-                                            value={option.value}
-                                        >
-                                            {option.label}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
+                            <div className="home-section__select-wrap" ref={formatRef}>
+    <button
+        type="button"
+        className="home-section__select home-section__select-btn"
+        onClick={() => setIsFormatOpen((prev) => !prev)}
+    >
+        {formatOptions.find((option) => option.value === format)?.label || 'All formats'}
+    </button>
 
-                            <div className="home-section__select-wrap">
-                                <select
-                                    className="home-section__select"
-                                    value={category}
-                                    onChange={(e) =>
-                                        setCategory(
-                                            e.target.value as
-                                                | ''
-                                                | EventCategory,
-                                        )
-                                    }
-                                >
-                                    {categoryOptions.map((option) => (
-                                        <option
-                                            key={
-                                                option.value || 'all-categories'
-                                            }
-                                            value={option.value}
-                                        >
-                                            {option.label}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
+    {isFormatOpen && (
+        <div className="home-section__select-popup">
+            {formatOptions.map((option) => (
+                <button
+                    key={option.value || 'all-formats'}
+                    type="button"
+                    className={`home-section__select-option ${format === option.value ? 'is-active' : ''}`}
+                    onClick={() => {
+                        setFormat(option.value);
+                        setIsFormatOpen(false);
+                    }}
+                >
+                    {option.label}
+                </button>
+            ))}
+        </div>
+    )}
+</div>
+                            <div className="home-section__select-wrap" ref={categoryRef}>
+    <button
+        type="button"
+        className="home-section__select home-section__select-btn"
+        onClick={() => setIsCategoryOpen((prev) => !prev)}
+    >
+        {categoryOptions.find((option) => option.value === category)?.label || 'Themes'}
+    </button>
+
+    {isCategoryOpen && (
+        <div className="home-section__select-popup">
+            {categoryOptions.map((option) => (
+                <button
+                    key={option.value || 'all-categories'}
+                    type="button"
+                    className={`home-section__select-option ${category === option.value ? 'is-active' : ''}`}
+                    onClick={() => {
+                        setCategory(option.value);
+                        setIsCategoryOpen(false);
+                    }}
+                >
+                    {option.label}
+                </button>
+            ))}
+        </div>
+    )}
+</div>
                         </div>
                     </div>
 
