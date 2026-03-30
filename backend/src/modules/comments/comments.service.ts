@@ -74,7 +74,29 @@ export class CommentsService {
 
     const savedComment = await this.commentsRepository.save(comment);
 
-    return this.sanitizeComment(savedComment);
+    const commentWithAuthor = await this.commentsRepository
+      .createQueryBuilder('comment')
+      .leftJoin(User, 'user', 'user.id = comment.authorUserId')
+      .select([
+        'comment.id AS id',
+        'comment.eventId AS "eventId"',
+        'comment.authorUserId AS "authorUserId"',
+        'comment.content AS content',
+        'comment.createdAt AS "createdAt"',
+        'user.login AS "authorLogin"',
+      ])
+      .where('comment.id = :id', { id: savedComment.id })
+      .getRawOne();
+
+    return {
+      id: commentWithAuthor.id,
+      eventId: commentWithAuthor.eventId,
+      authorUserId: commentWithAuthor.authorUserId,
+      content: commentWithAuthor.content,
+      createdAt: commentWithAuthor.createdAt,
+      eventTitle: null,
+      authorLogin: commentWithAuthor.authorLogin ?? null,
+    };
   }
 
   async getByEventId(eventId: string) {
@@ -86,12 +108,30 @@ export class CommentsService {
       throw new NotFoundException('Event not found');
     }
 
-    const comments = await this.commentsRepository.find({
-      where: { eventId },
-      order: { createdAt: 'DESC' },
-    });
+    const comments = await this.commentsRepository
+      .createQueryBuilder('comment')
+      .leftJoin(User, 'user', 'user.id = comment.authorUserId')
+      .select([
+        'comment.id AS id',
+        'comment.eventId AS "eventId"',
+        'comment.authorUserId AS "authorUserId"',
+        'comment.content AS content',
+        'comment.createdAt AS "createdAt"',
+        'user.login AS "authorLogin"',
+      ])
+      .where('comment.eventId = :eventId', { eventId })
+      .orderBy('comment.createdAt', 'DESC')
+      .getRawMany();
 
-    return comments.map((comment) => this.sanitizeComment(comment));
+    return comments.map((comment) => ({
+      id: comment.id,
+      eventId: comment.eventId,
+      authorUserId: comment.authorUserId,
+      content: comment.content,
+      createdAt: comment.createdAt,
+      eventTitle: null,
+      authorLogin: comment.authorLogin ?? null,
+    }));
   }
 
   async delete(
@@ -118,13 +158,15 @@ export class CommentsService {
     };
   }
 
-  private sanitizeComment(comment: Comment) {
+  private sanitizeComment(comment: Comment, authorLogin: string | null = null) {
     return {
       id: comment.id,
       eventId: comment.eventId,
       authorUserId: comment.authorUserId,
       content: comment.content,
       createdAt: comment.createdAt,
+      eventTitle: null,
+      authorLogin,
     };
   }
 }

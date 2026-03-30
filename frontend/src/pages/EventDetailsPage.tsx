@@ -106,6 +106,21 @@ export function EventDetailsPage() {
     const [attendeesForbidden, setAttendeesForbidden] = useState(false);
     const maxAvailableTickets =
         event?.availableTickets ?? event?.ticketsLimit ?? 0;
+
+    const uniqueVisibleAttendees = useMemo(() => {
+        const map = new Map<string, EventAttendeeItem>();
+
+        attendees.forEach((item) => {
+            if (!item.showInVisitors) return;
+            if (!item.userId) return;
+            if (!map.has(item.userId)) {
+                map.set(item.userId, item);
+            }
+        });
+
+        return Array.from(map.values());
+    }, [attendees]);
+
     useEffect(() => {
         if (!id) return;
 
@@ -536,10 +551,10 @@ export function EventDetailsPage() {
                             List of participants
                         </h2>
 
-                        {attendees.length > 0 ? (
+                        {uniqueVisibleAttendees.length > 0 ? (
                             <div className="event-details-participants">
-                                {attendees.map((item) => (
-                                    <span key={item.id}>
+                                {uniqueVisibleAttendees.map((item) => (
+                                    <span key={item.userId}>
                                         @{item.user?.login || 'user'}
                                     </span>
                                 ))}
@@ -603,10 +618,8 @@ export function EventDetailsPage() {
                                             <div className="event-details-comment__top">
                                                 <span>
                                                     @
-                                                    {comment.authorUserId.slice(
-                                                        0,
-                                                        8,
-                                                    )}
+                                                    {comment.authorLogin ||
+                                                        'user'}
                                                 </span>
                                                 <span>
                                                     {formatCommentDate(

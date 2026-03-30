@@ -352,6 +352,7 @@
     font-size: var(--med-font-size-22);
     font-weight: var(--medium);
     margin: 0;
+    margin-bottom: 15px;
 }
 
 .event-details-comment-form {
