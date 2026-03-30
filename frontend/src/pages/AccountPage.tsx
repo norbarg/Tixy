@@ -918,19 +918,21 @@ async function handleDeleteMyEvent(id: string) {
                                 {adminComments.map((item) => (
                                     <div key={item.id} className="admin-row">
                                         <div className="admin-row__info">
-                                            <p>
-                                                <strong>Comment:</strong>{' '}
-                                                {item.content}
-                                            </p>
-                                            <p>
-                                                <strong>Event ID:</strong>{' '}
-                                                {item.eventId}
-                                            </p>
-                                            <p>
-                                                <strong>Author ID:</strong>{' '}
-                                                {item.authorUserId}
-                                            </p>
-                                        </div>
+    <p>
+        <strong>Comment:</strong>{' '}
+        {item.content}
+    </p>
+
+    <p>
+        <strong>Event:</strong>{' '}
+        {item.eventTitle ?? 'Event not found'}
+    </p>
+
+    <p>
+        <strong>Author:</strong>{' '}
+        {item.authorLogin ?? 'User not found'}
+    </p>
+</div>
 
                                         <button
                                             className="account-danger-btn"

@@ -5,4 +5,6 @@ export type CommentItem = {
     authorUserId: string;
     content: string;
     createdAt: string;
+    eventTitle: string | null;
+    authorLogin: string | null;
 };

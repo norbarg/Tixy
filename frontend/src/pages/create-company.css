@@ -252,3 +252,215 @@
     color: rgba(255, 255, 255, 0.65);
     cursor: default;
 }
+
+
+@media (max-width: 1100px) {
+    .create-company-page {
+        padding: 90px 32px 56px;
+    }
+
+    .create-company-page__inner {
+        max-width: 920px;
+    }
+
+    .create-company-form__header {
+        margin-bottom: 48px;
+    }
+
+    .create-company-form__title {
+        font-size: 28px;
+    }
+
+    .create-company-form__subtitle {
+        font-size: 16px;
+    }
+
+    .create-company-form__content {
+        grid-template-columns: 260px minmax(0, 1fr);
+        gap: 48px;
+    }
+
+    .create-company-avatar {
+        width: 240px;
+        height: 240px;
+    }
+
+    .create-company-avatar__icon {
+        width: 240px;
+        height: 240px;
+    }
+
+    .create-company-form__hint {
+        margin-top: 16px;
+        font-size: 13px;
+    }
+
+    .create-company-field__label {
+        font-size: 18px;
+    }
+
+    .create-company-field__input,
+    .create-company-field__textarea {
+        width: 100%;
+        max-width: 100%;
+        font-size: 17px;
+    }
+
+    .create-company-field__textarea {
+        height: 90px;
+        min-height: 90px;
+        max-height: 90px;
+    }
+
+    .create-company-form__actions {
+        margin-top: 22px;
+    }
+}
+
+@media (max-width: 767px) {
+    .create-company-page {
+        min-height: auto;
+        padding: 72px 20px 44px;
+    }
+
+    .create-company-page__inner {
+        max-width: 100%;
+    }
+
+    .create-company-form__header {
+        margin-bottom: 34px;
+    }
+
+    .create-company-form__title {
+        font-size: 24px;
+        line-height: 1.15;
+        margin-bottom: 8px;
+    }
+
+    .create-company-form__subtitle {
+        font-size: 14px;
+        line-height: 1.45;
+        max-width: 320px;
+        margin: 0 auto;
+    }
+
+    .create-company-form__content {
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+    }
+
+    .create-company-form__avatar-wrap {
+        width: 100%;
+    }
+
+    .create-company-avatar {
+        width: 190px;
+        height: 190px;
+    }
+
+    .create-company-avatar__icon {
+        width: 190px;
+        height: 190px;
+    }
+
+    .create-company-form__hint {
+        margin-top: 14px;
+        font-size: 13px;
+        max-width: 240px;
+    }
+
+    .create-company-form__fields {
+        width: 100%;
+    }
+
+    .create-company-field {
+        margin-bottom: 16px;
+    }
+
+    .create-company-field__label {
+        font-size: 16px;
+        margin-bottom: 4px;
+    }
+
+    .create-company-field__input,
+    .create-company-field__textarea {
+        width: 100%;
+        max-width: 100%;
+        font-size: 16px;
+        padding: 10px 0 10px;
+    }
+
+    .create-company-field__textarea {
+        height: 84px;
+        min-height: 84px;
+        max-height: 84px;
+        padding-right: 4px;
+    }
+
+    .create-company-form__error {
+        font-size: 14px;
+        margin-top: 4px;
+    }
+    .create-company-form__actions {
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.create-company-form__submit {
+    width: 145px;
+    max-width: none;
+    height: 44px;
+    font-size: 16px;
+    border-radius: 10px;
+    padding: 0 14px 0 18px;
+}
+
+    .create-company-field__suggestions {
+        top: calc(100% + 6px);
+        border-radius: 10px;
+    }
+
+    .create-company-field__suggestion {
+        padding: 11px 14px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+    .create-company-page {
+        padding: 64px 16px 36px;
+    }
+
+    .create-company-form__title {
+        font-size: 22px;
+    }
+
+    .create-company-form__subtitle {
+        font-size: 13px;
+    }
+
+    .create-company-avatar {
+        width: 168px;
+        height: 168px;
+    }
+
+    .create-company-avatar__icon {
+        width: 168px;
+        height: 168px;
+    }
+
+    .create-company-field__label {
+        font-size: 15px;
+    }
+
+    .create-company-field__input,
+    .create-company-field__textarea {
+        font-size: 15px;
+    }
+
+    .create-company-form__submit {
+        height: 44px;
+        font-size: 15px;
+    }
+}

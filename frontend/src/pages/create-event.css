@@ -800,3 +800,395 @@
 .react-datepicker__day-name {
     color: #d2222f !important;
 }
+
+/* timepicker */
+.react-datepicker__time-list {
+    height: 340px !important;
+    padding: 8px 0 !important;
+    overflow-y: auto !important;
+
+    scrollbar-width: none;
+
+    -ms-overflow-style: none;
+}
+.react-datepicker__time-list::-webkit-scrollbar {
+    display: none;
+}
+
+.react-datepicker__time-container {
+    background: #111111 !important;
+}
+
+.react-datepicker__time {
+    background: #111111 !important;
+}
+
+.react-datepicker__time-box {
+    background: #111111 !important;
+}
+
+@media (max-width: 1100px) {
+    .create-event-page {
+        padding: 96px 32px 56px;
+    }
+
+    .create-event-page__inner {
+        max-width: 100%;
+    }
+
+    .create-event-form__header {
+        margin-bottom: 42px;
+    }
+
+    .create-event-form__title {
+        font-size: 28px;
+    }
+
+    .create-event-form__grid {
+        grid-template-columns: 1fr;
+        row-gap: 36px;
+    }
+
+    .create-event-media {
+        gap: 28px;
+    }
+
+    .create-event-media__poster-block {
+        align-items: center;
+    }
+
+    .event-upload--poster {
+        width: 230px;
+        height: 290px;
+    }
+
+    .create-event-media__banner-row {
+        grid-template-columns: minmax(0, 1fr) 260px;
+        gap: 24px;
+        align-items: start;
+    }
+
+    .create-event-media__banner-main {
+        min-width: 0;
+    }
+
+    .event-upload--banner {
+        width: 100%;
+        height: 190px;
+        min-height: 190px;
+        max-height: 190px;
+    }
+
+    .promo-field--side {
+        margin-top: 36px;
+        margin-left: 0;
+    }
+
+    .create-event-fields {
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 24px;
+    }
+
+    .event-field__input--wide,
+    .event-field__textarea--wide,
+    .event-field__textarea {
+        max-width: 100%;
+    }
+
+    .create-event-fields__row--price {
+        gap: 48px;
+        flex-wrap: wrap;
+    }
+
+    .create-event-bottom {
+        align-items: stretch;
+        gap: 24px;
+    }
+
+    .create-event-bottom__left {
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+    }
+
+    .event-select--visibility {
+        min-width: 0;
+        grid-column: 1 / -1;
+    }
+
+    .event-field__input--redirect,
+    .event-field__publication-picker {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .create-event-bottom__right {
+        justify-content: space-between;
+        align-items: center;
+        gap: 18px;
+    }
+
+    .event-checkbox {
+        max-width: 520px;
+        line-height: 1.4;
+    }
+}
+
+@media (max-width: 767px) {
+    .create-event-page {
+        min-height: auto;
+        padding: 72px 20px 44px;
+    }
+
+    .create-event-form__header {
+        margin-bottom: 30px;
+    }
+
+    .create-event-form__title {
+        font-size: 24px;
+        line-height: 1.15;
+    }
+
+    .create-event-form__grid {
+        grid-template-columns: 1fr;
+        row-gap: 28px;
+    }
+
+    .create-event-media {
+        gap: 22px;
+    }
+
+    .create-event-media__banner-row {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    .create-event-media__banner-main {
+        order: 1;
+        gap: 12px;
+    }
+
+    .create-event-media__poster-block {
+        order: 2;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .promo-field--side {
+        order: 3;
+        width: 100%;
+        margin: 0;
+    }
+
+    .create-event-media__banner-label {
+        font-size: 16px;
+        margin-top: 0;
+        margin-bottom: 2px;
+    }
+
+    .event-upload--banner {
+        width: 100%;
+        height: 136px;
+        min-height: 136px;
+        max-height: 136px;
+        border-radius: 14px;
+    }
+
+    .event-upload--poster {
+        width: 148px;
+        height: 188px;
+        border-radius: 14px;
+    }
+
+    .create-event-fields {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    .create-event-fields__left,
+    .create-event-fields__right {
+        gap: 16px;
+    }
+
+    .event-field__label {
+        font-size: 16px;
+        margin-bottom: 4px;
+    }
+
+    .event-field__input,
+    .event-field__textarea,
+    .event-select__trigger,
+    .event-field__input--datepicker {
+        width: 100%;
+        max-width: 100%;
+        font-size: 16px;
+        padding: 10px 0 10px;
+    }
+
+    .event-field__input--wide,
+    .event-field__textarea--wide,
+    .event-field__input--short,
+    .event-field__input--date,
+    .event-field__input--publication,
+    .event-field__input--redirect {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .event-field__textarea {
+        height: 84px;
+        min-height: 84px;
+        max-height: 84px;
+        padding-right: 4px;
+    }
+
+    .create-event-fields__row--price {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+    }
+
+    .event-field__input-wrap {
+        width: 100%;
+    }
+
+    .create-event-fields__row--dates {
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .event-field__date-picker,
+    .event-field__publication-picker {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .promo-field__row,
+    .promo-field--side .promo-field__row {
+        grid-template-columns: minmax(0, 1fr) 72px 28px;
+        gap: 8px;
+    }
+
+    .promo-field__discount-wrap,
+    .promo-field__discount {
+        width: 72px;
+    }
+
+    .promo-field__action {
+        width: 28px;
+        height: 28px;
+        font-size: 26px;
+    }
+
+    .create-event-bottom {
+        gap: 20px;
+    }
+
+    .create-event-bottom__left {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    .event-select--visibility {
+        min-width: 0;
+    }
+
+    .create-event-bottom__right {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 18px;
+    }
+
+    .event-checkbox {
+        align-items: flex-start;
+        font-size: 14px;
+        line-height: 1.45;
+    }
+
+    .event-checkbox input {
+        margin-top: 2px;
+        width: 16px;
+        height: 16px;
+    }
+
+    .create-event-form__submit {
+        width: 168px;
+        max-width: none;
+        height: 44px;
+        margin-left: auto;
+        font-size: 16px;
+        border-radius: 10px;
+        padding: 0 14px 0 18px;
+    }
+
+    .event-select__menu,
+    .event-field__suggestions {
+        border-radius: 10px;
+    }
+
+    .event-select__item,
+    .event-field__suggestion {
+        font-size: 14px;
+        padding: 11px 14px;
+    }
+
+    .react-datepicker {
+        transform: scale(0.92);
+        transform-origin: top left;
+    }
+
+    .react-datepicker-popper {
+        max-width: calc(100vw - 32px);
+    }
+
+    .create-event-fields__row--price .event-field__input-wrap {
+    position: relative;
+}
+
+.create-event-fields__row--price .event-field__prefix {
+    left: 0;
+    top: 43%;
+    transform: translateY(-50%);
+    font-size: 16px;
+}
+
+.create-event-fields__row--price .event-field__input--short {
+    padding-left: 20px;
+}
+}
+
+@media (max-width: 480px) {
+    .create-event-page {
+        padding: 64px 16px 36px;
+    }
+
+    .create-event-form__title {
+        font-size: 22px;
+    }
+
+    .event-upload--banner {
+        height: 118px;
+        min-height: 118px;
+        max-height: 118px;
+    }
+
+    .event-upload--poster {
+        width: 132px;
+        height: 170px;
+    }
+
+    .create-event-fields__row--price {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .create-event-form__submit {
+        width: 145px;
+        height: 42px;
+        font-size: 15px;
+    }
+
+    .react-datepicker {
+        transform: scale(0.84);
+    }
+}
