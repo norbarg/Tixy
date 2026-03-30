@@ -268,11 +268,23 @@ export class TicketsService {
       doc.fillColor(blueGray).font('LeagueSpartan-Regular').fontSize(18);
       doc.text('LOCATION', infoX, 200);
 
-      doc.fillColor(textGray).font('LeagueSpartan-Medium').fontSize(16);
-      doc.text(event.placeAddress ?? event.placeName ?? '-', infoX, 240, {
-        width: 280,
-        ellipsis: true,
-      });
+      const locationText = event.placeAddress ?? event.placeName ?? '-';
+      const locationMaxWidth = 280;
+      const locationFontSize = this.getSingleLineFontSize(
+        doc,
+        locationText,
+        16,
+        8,
+        locationMaxWidth,
+      );
+
+      doc
+        .fillColor(textGray)
+        .font('LeagueSpartan-Medium')
+        .fontSize(locationFontSize)
+        .text(locationText, infoX, 240, {
+          lineBreak: false,
+        });
 
       doc
         .moveTo(infoX, 262)
@@ -339,6 +351,27 @@ export class TicketsService {
     const day = String(d.getUTCDate()).padStart(2, '0');
     const month = String(d.getUTCMonth() + 1).padStart(2, '0');
     return `${day}/${month}`;
+  }
+  private getSingleLineFontSize(
+    doc: PDFKit.PDFDocument,
+    value: string,
+    startFontSize: number,
+    minFontSize: number,
+    maxWidth: number,
+  ): number {
+    let fontSize = startFontSize;
+
+    while (fontSize > minFontSize) {
+      doc.fontSize(fontSize);
+
+      if (doc.widthOfString(value) <= maxWidth) {
+        return fontSize;
+      }
+
+      fontSize -= 0.5;
+    }
+
+    return minFontSize;
   }
 
   private async resolvePosterBuffer(posterUrl: string | null): Promise<Buffer> {
