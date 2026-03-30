@@ -989,3 +989,14 @@
         font-size: 20px;
     }
 }
+.event-purchase-card__button--soldout {
+    font-size: 24px;
+    background: transparent;
+    border-color: transparent;
+    color: #727e8a;
+    cursor: not-allowed;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

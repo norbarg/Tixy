@@ -39,6 +39,36 @@ export class OrdersService {
       throw new NotFoundException('Event not found');
     }
 
+    const soldOrReservedOrders = await this.ordersRepository.find({
+      where: [
+        {
+          eventId: dto.eventId,
+          paymentStatus: PaymentStatus.PAID,
+        },
+        {
+          eventId: dto.eventId,
+          paymentStatus: PaymentStatus.PENDING,
+        },
+      ],
+    });
+
+    const reservedTickets = soldOrReservedOrders.reduce(
+      (sum, order) => sum + order.quantity,
+      0,
+    );
+
+    const availableTickets = event.ticketsLimit - reservedTickets;
+
+    if (availableTickets <= 0) {
+      throw new BadRequestException('No tickets left for this event');
+    }
+
+    if (dto.quantity > availableTickets) {
+      throw new BadRequestException(
+        `Only ${availableTickets} ticket(s) left for this event`,
+      );
+    }
+
     let promoCodeEntity: PromoCode | null = null;
     let discountPercent = 0;
 

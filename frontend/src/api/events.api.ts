@@ -1,4 +1,4 @@
-// src/api/events.api.ts
+// frontend/src/api/events.api.ts
 
 import { api } from './axios';
 import type {

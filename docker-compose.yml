@@ -1,0 +1,61 @@
+version: '3.9'
+
+services:
+    postgres:
+        image: postgres:16
+        container_name: tixy_postgres
+        restart: unless-stopped
+        environment:
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres123
+            POSTGRES_DB: tixy_db
+        ports:
+            - '5432:5432'
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+        healthcheck:
+            test: ['CMD-SHELL', 'pg_isready -U postgres -d tixy_db']
+            interval: 5s
+            timeout: 5s
+            retries: 20
+
+    backend:
+        build:
+            context: ./backend
+            dockerfile: Dockerfile
+        container_name: tixy_backend
+        restart: unless-stopped
+        depends_on:
+            postgres:
+                condition: service_healthy
+        env_file:
+            - ./backend/.env.docker
+        ports:
+            - '5001:5001'
+        volumes:
+            - ./backend:/app
+            - /app/node_modules
+            - ./backend/uploads:/app/uploads
+        working_dir: /app
+        command: npm run start:dev
+
+    frontend:
+        build:
+            context: ./frontend
+            dockerfile: Dockerfile
+        container_name: tixy_frontend
+        restart: unless-stopped
+        depends_on:
+            - backend
+        environment:
+            VITE_API_URL: http://localhost:5001/api
+        ports:
+            - '5173:5173'
+        volumes:
+            - ./frontend:/app
+            - /app/node_modules
+        working_dir: /app
+        command: npm run dev -- --host 0.0.0.0
+
+volumes:
+    postgres_data:

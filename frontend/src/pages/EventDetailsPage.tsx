@@ -103,6 +103,9 @@ export function EventDetailsPage() {
     const [visibleSimilarEventsCount, setVisibleSimilarEventsCount] =
         useState(3);
 
+    const [attendeesForbidden, setAttendeesForbidden] = useState(false);
+    const maxAvailableTickets =
+        event?.availableTickets ?? event?.ticketsLimit ?? 0;
     useEffect(() => {
         if (!id) return;
 
@@ -114,18 +117,31 @@ export function EventDetailsPage() {
                 const eventData = await eventsApi.getById(id);
                 setEvent(eventData);
 
-                const [companyData, commentsData, attendeesData, eventsData] =
+                const [companyData, commentsData, eventsData] =
                     await Promise.all([
                         companiesApi.getById(eventData.companyId),
                         commentsApi.getByEventId(eventData.id),
-                        attendeesApi.getByEventId(eventData.id),
                         eventsApi.getAll(),
                     ]);
 
                 setCompany(companyData);
                 setComments(commentsData);
-                setAttendees(attendeesData);
                 setAllEvents(eventsData);
+
+                try {
+                    const attendeesData = await attendeesApi.getByEventId(
+                        eventData.id,
+                    );
+                    setAttendees(attendeesData);
+                    setAttendeesForbidden(false);
+                } catch (attendeesError: any) {
+                    if (attendeesError?.response?.status === 403) {
+                        setAttendees([]);
+                        setAttendeesForbidden(true);
+                    } else {
+                        throw attendeesError;
+                    }
+                }
 
                 if (isAuthenticated) {
                     try {
@@ -428,14 +444,26 @@ export function EventDetailsPage() {
                                                 Math.max(1, prev - 1),
                                             )
                                         }
+                                        disabled={quantity <= 1}
                                     >
                                         -
                                     </button>
+
                                     <span>{quantity}</span>
+
                                     <button
                                         type="button"
                                         onClick={() =>
-                                            setQuantity((prev) => prev + 1)
+                                            setQuantity((prev) =>
+                                                Math.min(
+                                                    maxAvailableTickets,
+                                                    prev + 1,
+                                                ),
+                                            )
+                                        }
+                                        disabled={
+                                            quantity >= maxAvailableTickets ||
+                                            maxAvailableTickets <= 0
                                         }
                                     >
                                         +
@@ -477,21 +505,27 @@ export function EventDetailsPage() {
                                 </span>
                             </label>
 
-                            <button
-                                type="button"
-                                className="event-purchase-card__button"
-                                onClick={handleBuyNow}
-                                disabled={!isAuthenticated || isBuying}
-                            >
-                                <span>
-                                    {isBuying ? 'Loading...' : 'Buy Now'}
-                                </span>
-                                <img
-                                    src={Arrow2}
-                                    alt=""
-                                    className="event-purchase-card__button-icon"
-                                />
-                            </button>
+                            {maxAvailableTickets <= 0 ? (
+                                <div className="event-purchase-card__button event-purchase-card__button--soldout">
+                                    <span>SOLD OUT</span>
+                                </div>
+                            ) : (
+                                <button
+                                    type="button"
+                                    className="event-purchase-card__button"
+                                    onClick={handleBuyNow}
+                                    disabled={!isAuthenticated || isBuying}
+                                >
+                                    <span>
+                                        {isBuying ? 'Loading...' : 'Buy Now'}
+                                    </span>
+                                    <img
+                                        src={Arrow2}
+                                        alt=""
+                                        className="event-purchase-card__button-icon"
+                                    />
+                                </button>
+                            )}
                         </div>
                     </div>
 
@@ -510,6 +544,11 @@ export function EventDetailsPage() {
                                     </span>
                                 ))}
                             </div>
+                        ) : attendeesForbidden ? (
+                            <p className="event-details-empty">
+                                Participants list is available only for ticket
+                                holders.
+                            </p>
                         ) : (
                             <p className="event-details-empty">
                                 No visible participants yet.

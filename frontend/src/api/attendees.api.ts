@@ -1,3 +1,4 @@
+//frontend/src/api/attendees.api.ts
 import { api } from './axios';
 
 export type EventAttendeeItem = {

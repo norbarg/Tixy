@@ -43,6 +43,7 @@ export interface EventItem {
     ticketsLimit: number;
     visitorsVisibility: string;
     notifyOnNewVisitor?: boolean;
+    availableTickets?: number;
     status: string;
     createdAt: string;
     updatedAt: string;

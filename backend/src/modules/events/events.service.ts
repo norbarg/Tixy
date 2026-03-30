@@ -15,6 +15,8 @@ import { EventStatus } from '../../common/enums/event-status.enum';
 import { VisitorsVisibility } from '../../common/enums/visitors-visibility.enum';
 import { GetEventsQueryDto } from './dto/get-events-query.dto';
 import { NotificationsService } from '../notifications/notifications.service';
+import { Order } from '../../database/entities/orders.entity';
+import { PaymentStatus } from '../../common/enums/payment-status.enum';
 
 @Injectable()
 export class EventsService {
@@ -23,6 +25,8 @@ export class EventsService {
     private readonly eventsRepository: Repository<Event>,
     @InjectRepository(Company)
     private readonly companiesRepository: Repository<Company>,
+    @InjectRepository(Order)
+    private readonly ordersRepository: Repository<Order>,
     private readonly notificationsService: NotificationsService,
   ) {}
 
@@ -169,7 +173,7 @@ export class EventsService {
 
     const events = await qb.getMany();
 
-    return events.map((event) => this.sanitizePublicEvent(event));
+    return Promise.all(events.map((event) => this.sanitizePublicEvent(event)));
   }
 
   async getPublicById(id: string) {
@@ -226,7 +230,27 @@ export class EventsService {
       throw new ForbiddenException('You do not have access to this event');
     }
   }
+  private async getAvailableTickets(eventId: string, ticketsLimit: number) {
+    const soldOrReservedOrders = await this.ordersRepository.find({
+      where: [
+        {
+          eventId,
+          paymentStatus: PaymentStatus.PAID,
+        },
+        {
+          eventId,
+          paymentStatus: PaymentStatus.PENDING,
+        },
+      ],
+    });
 
+    const reservedTickets = soldOrReservedOrders.reduce(
+      (sum, order) => sum + order.quantity,
+      0,
+    );
+
+    return Math.max(0, ticketsLimit - reservedTickets);
+  }
   async getMyEvents(ownerUserId: string) {
     // events created by me
     const company = await this.findCompanyByOwnerUserId(ownerUserId);
@@ -240,10 +264,15 @@ export class EventsService {
       order: { createdAt: 'DESC' },
     });
 
-    return events.map((event) => this.sanitizePrivateEvent(event));
+    return Promise.all(events.map((event) => this.sanitizePrivateEvent(event)));
   }
 
-  private sanitizePublicEvent(event: Event) {
+  private async sanitizePublicEvent(event: Event) {
+    const availableTickets = await this.getAvailableTickets(
+      event.id,
+      event.ticketsLimit,
+    );
+
     return {
       id: event.id,
       companyId: event.companyId,
@@ -265,6 +294,7 @@ export class EventsService {
       redirectAfterPurchaseUrl: event.redirectAfterPurchaseUrl,
       price: event.price,
       ticketsLimit: event.ticketsLimit,
+      availableTickets,
       visitorsVisibility: event.visitorsVisibility,
       status: event.status,
       createdAt: event.createdAt,
@@ -272,7 +302,12 @@ export class EventsService {
     };
   }
 
-  private sanitizePrivateEvent(event: Event) {
+  private async sanitizePrivateEvent(event: Event) {
+    const availableTickets = await this.getAvailableTickets(
+      event.id,
+      event.ticketsLimit,
+    );
+
     return {
       id: event.id,
       companyId: event.companyId,
@@ -294,6 +329,7 @@ export class EventsService {
       redirectAfterPurchaseUrl: event.redirectAfterPurchaseUrl,
       price: event.price,
       ticketsLimit: event.ticketsLimit,
+      availableTickets,
       visitorsVisibility: event.visitorsVisibility,
       notifyOnNewVisitor: event.notifyOnNewVisitor,
       status: event.status,
