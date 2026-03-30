@@ -401,14 +401,14 @@
 }
 
 .home-cta__character--center {
-    left: 419px;
-    bottom: -3px;
+    left: 428px;
+    bottom: -11px;
     width: 450px;
 }
 
 .home-cta__character--right {
-    right: 40px;
-    bottom: 0px;
+    right: 45px;
+    bottom: -13px;
     width: 370px;
 }
 

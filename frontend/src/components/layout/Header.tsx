@@ -13,6 +13,7 @@ import flagUs from '../../assets/auth/flag-us.png';
 import bellIcon from '../../assets/auth/bell.png';
 import cartIcon from '../../assets/auth/cart.png';
 import './header.css';
+import { CreateNewsModal } from '../company-news/CreateNewsModal';
 
 function formatNotificationTime(value: string) {
     const date = new Date(value);
@@ -35,7 +36,8 @@ export function Header() {
     const [notifications, setNotifications] = useState<NotificationItem[]>([]);
     const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
     const [isNotificationsLoading, setIsNotificationsLoading] = useState(false);
-
+    const [isCreateNewsOpen, setIsCreateNewsOpen] = useState(false);
+    const [myCompanyId, setMyCompanyId] = useState<string | null>(null); 
     const notificationsRef = useRef<HTMLDivElement | null>(null);
 
     const { subtotal, hasItems } = useCart();
@@ -87,15 +89,18 @@ export function Header() {
     useEffect(() => {
         const fetchMyCompany = async () => {
             if (!isAuthenticated) {
-                setHasCompany(false);
-                setIsCheckingCompany(false);
-                return;
-            }
+    setHasCompany(false);
+    setMyCompanyId(null);
+    setIsCheckingCompany(false);
+    return;
+}
 
             try {
                 setIsCheckingCompany(true);
-                await api.get('/companies/my');
-                setHasCompany(true);
+                const { data } = await api.get('/companies/my');
+setHasCompany(true);
+
+setMyCompanyId(data.id);
             } catch (error) {
                 if (
                     axios.isAxiosError(error) &&
@@ -115,22 +120,39 @@ export function Header() {
     }, [isAuthenticated]);
 
     useEffect(() => {
-        const fetchNotifications = async () => {
-            if (!isAuthenticated) {
-                setNotifications([]);
-                return;
-            }
+    let intervalId: number | undefined;
 
-            try {
-                const data = await notificationsApi.getMyNotifications();
-                setNotifications(data);
-            } catch (error) {
-                console.error('Failed to fetch notifications:', error);
-            }
-        };
+    const fetchNotifications = async () => {
+        if (!isAuthenticated) {
+            setNotifications([]);
+            return;
+        }
 
+        try {
+            const data = await notificationsApi.getMyNotifications();
+            setNotifications(data);
+        } catch (error) {
+            console.error('Failed to fetch notifications:', error);
+        }
+    };
+
+    if (!isAuthenticated) {
+        setNotifications([]);
+        return;
+    }
+
+    fetchNotifications();
+
+    intervalId = window.setInterval(() => {
         fetchNotifications();
-    }, [isAuthenticated]);
+    }, 10000);
+
+    return () => {
+        if (intervalId) {
+            window.clearInterval(intervalId);
+        }
+    };
+}, [isAuthenticated]);
 
     const handleBellClick = async () => {
         if (!isAuthenticated) return;
@@ -221,11 +243,26 @@ export function Header() {
                             >
                                 Home Page
                             </Link>
+<div className="header__news-popover">
+    {!isCheckingCompany && hasCompany && (
+        <button
+            className="header__nav-btn"
+            type="button"
+            onClick={() => {
+                setIsCreateNewsOpen((prev) => !prev);
+                closeMenu();
+            }}
+        >
+            Create News
+        </button>
+    )}
 
-                            <button className="header__nav-btn" type="button">
-                                Create News
-                            </button>
-
+    <CreateNewsModal
+        isOpen={isCreateNewsOpen}
+        companyId={myCompanyId}
+        onClose={() => setIsCreateNewsOpen(false)}
+    />
+</div>
                             {!isCheckingCompany && (
                                 <Link
                                     to={
