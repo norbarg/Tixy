@@ -1,4 +1,4 @@
-# Tixy
+# Tixy 
 
 Tixy is a web application for creating, discovering, following, and purchasing tickets for events. The platform is focused on a clean user experience for both organizers and attendees: organizers can create companies and publish events, while users can browse upcoming events, subscribe to events or companies, buy tickets, receive notifications, and access their purchased tickets.
 
